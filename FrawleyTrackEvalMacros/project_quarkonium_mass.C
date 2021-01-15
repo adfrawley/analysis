@@ -38,8 +38,8 @@ void project_quarkonium_mass()
   Float_t decaymass=0.000511;
 
   // what do we have in the file?
-  int events_per_file = 1;
-  int num_ups_per_event = 20;
+  int events_per_file = 10000;
+  int num_ups_per_event = 1;
  
  // what maximum yields do we want?
   // These are pp yields for 197 /nb of pp running, with 
@@ -77,7 +77,7 @@ void project_quarkonium_mass()
 
   cout << "Upsilons requested = " << nupsmax << endl;
 
-  for(int ifile=0;ifile<1000;ifile++)
+  for(int ifile=0;ifile<1;ifile++)
     {
       if(nups[0] > nupsmax[0])
 	break;
@@ -86,7 +86,14 @@ void project_quarkonium_mass()
 
       //sprintf(name,"/sphenix/user/frawley/cluster_efficiency/macros/macros/g4simulations/eval_output/g4svtx_eval_%i.root_g4svtx_eval.root",ifile);
       //sprintf(name,"/sphenix/user/frawley/acts_qa/macros/macros/g4simulations/eval_output_3/g4svtx_eval_%i.root_g4svtx_eval.root",ifile);
-      sprintf(name,"/sphenix/user/frawley/acts_qa/macros/macros/g4simulations/eval_output_2/g4svtx_eval_%i.root_g4svtx_eval.root",ifile);
+      //sprintf(name,"/sphenix/user/frawley/acts_qa/macros/macros/g4simulations/eval_output_2/g4svtx_eval_%i.root_g4svtx_eval.root",ifile);
+
+      //sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_10k_increase_G4sPHENIX_g4svtx_eval.root");
+      //sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_10k_nocuts_G4sPHENIX_g4svtx_eval.root");      
+      //sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_genfit_10k_nocuts_G4sPHENIX_g4svtx_eval.root")
+      //sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_genfit_10k_increase_G4sPHENIX_g4svtx_eval.root");
+      //sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_double_phi_G4sPHENIX_g4svtx_eval.root");
+      sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_phtpctracker_G4sPHENIX_g4svtx_eval.root");
       
       cout << "Adding file number " << ifile << " with name " << name << endl;     
 
@@ -117,7 +124,7 @@ void project_quarkonium_mass()
 	{
 	  ntp_track->GetEntry(i);
 	  
-	  if(gembed != 2)
+	  if(gembed != 1)
 	    continue;
 
 	  hdca2d->Fill(pt, dca2d);
@@ -153,11 +160,14 @@ void project_quarkonium_mass()
 	      for(int i=0;i<ntracks;i++)
 		{
 		  ntp_track->GetEntry(i);
-		  
+
 		  if(event != iev)
 		    continue;
+
+		  //cout << " iev " << iev << " event " << event << " i " << i << endl;		  
 		  
-		  if(gembed != iups+3)
+		  //if(gembed != iups+3)
+		  if(gembed != 1)
 		    continue;
 
 		  if(quality > quality_cut)
@@ -212,9 +222,10 @@ void project_quarkonium_mass()
 		  recomass[istate]->Fill(tsum.M());
 		  recomass[3]->Fill(tsum.M()); // total spectrum
 		  if(tsum.M() > 7 && tsum.M() < 11)
-		    nups[istate]++;
-		  //cout << " event " << event << " gembed " << gembed << endl;	  
-		  //cout << " istate " << " nups[istate] " << nups[istate] << " reco mass " << tsum.M() << endl;
+		    {
+		      nups[istate]++;
+		      cout << " iev " << iev << " event " << event << " gembed " << gembed << " istate " << " nups[istate] " << nups[istate] << " reco mass " << tsum.M() << endl;
+		    }
 		}
 	    }
 	}

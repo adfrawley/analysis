@@ -9,6 +9,58 @@
 #include <TROOT.h>
 #include <TLatex.h>
 
+
+//____________________________________________
+Double_t CrystallBall2( Double_t x, Double_t mean, Double_t sigma, Double_t alpha1, Double_t n1, Double_t alpha2, Double_t n2 )
+{
+
+  Double_t t = (x-mean)/sigma;
+  if( t < -alpha1 )
+  {
+    Double_t a = TMath::Power( n1/alpha1, n1 )*TMath::Exp( -TMath::Power( alpha1, 2 )/2 );
+    Double_t b = n1/alpha1 - alpha1;
+    return a/TMath::Power( b - t, n1 );
+
+  } else if( t > alpha2 ) {
+
+    Double_t a = TMath::Power( n2/alpha2, n2 )*TMath::Exp( -TMath::Power( alpha2,2 )/2 );
+    Double_t b = n2/alpha2 - alpha2;
+    return a/TMath::Power( b + t, n2 );
+
+  } else return TMath::Exp( -TMath::Power( t, 2 )/2 );
+
+}
+
+//____________________________________________
+Double_t CrystallBall2Integral( Double_t sigma, Double_t alpha1, Double_t n1, Double_t alpha2, Double_t n2 )
+{
+  // get corresponding integral
+  alpha1 = fabs( alpha1 );
+  alpha2 = fabs( alpha2 );
+  return sigma*(
+		n1/(alpha1*(n1-1))*TMath::Exp( -pow( alpha1, 2 )/2 ) +
+		n2/(alpha2*(n2-1))*TMath::Exp( -pow( alpha2,2 )/2 ) +
+    TMath::Sqrt( TMath::Pi()/2)*TMath::Erfc( -alpha1/TMath::Sqrt(2) ) -
+    TMath::Sqrt( TMath::Pi()/2)*TMath::Erfc( alpha2/TMath::Sqrt(2) ) );
+
+}
+
+//____________________________________________
+Double_t CrystallBall2( Double_t *x, Double_t *par )
+{
+
+  // get normalized Crystal ball
+  Double_t result = CrystallBall2( x[0], par[1], par[2], par[3], par[4], par[5], par[6] );
+
+  // get integral
+  Double_t integral = CrystallBall2Integral( par[2], par[3], par[4], par[5], par[6] );
+
+  // return scaled Crystalball so that par[0] corresponds to integral
+  return par[0] * result/integral;
+
+}
+
+
 Double_t CBcalc(Double_t *xx, Double_t *par)
 {
   double f;
@@ -119,6 +171,9 @@ void CBfitter_1state()
   //bool do_subtracted = true;
  
   file1S = new TFile("root_files/ntp_quarkonium_out.root");
+  //file1S = new TFile("root_files/upsilons_double_phi_increase_ntp_quarkonium_out.root");
+  //file1S = new TFile("root_files/upsilons_genfit_increase_10k_ntp_quarkonium_out.root");
+  //file1S = new TFile("root_files/upsilons_nocuts_10k_ntp_quarkonium_out.root");
 
   if(!file1S)
     {
@@ -136,78 +191,120 @@ void CBfitter_1state()
     }
 
   recomass->GetXaxis()->SetTitle("invariant mass (GeV/c^{2})");
-  recomass->Sumw2();
-
-  int nrebin = 1;  // set to 2 to match background histo binning, but this worsens resolution slightly. Use 1 for signal fit
-  //int nrebin = 2;  // set to 2 to match background histo binning, but this worsens resolution slightly. Use 1 for signal fit
-  recomass->Rebin(nrebin);
-  
-  TCanvas *cups = new TCanvas("cups","cups",5,5,800,800);
   recomass->SetTitle("Y(1S,2S,3S) #rightarrow e^{+}e^{-}");
   recomass->SetMarkerStyle(20);
   recomass->SetMarkerSize(1);
   recomass->SetLineStyle(kSolid);
   recomass->SetLineWidth(2);
-  //  recomass->SetMaximum(700);
-  recomass->DrawCopy("p");
+  recomass->Sumw2();  
+
+  int nrebin = 1;  // set to 2 to match background histo binning, but this worsens resolution slightly. Use 1 for signal fit
+  //int nrebin = 2;  // set to 2 to match background histo binning, but this worsens resolution slightly. Use 1 for signal fit
+  recomass->Rebin(nrebin);
+
+  bool cb2 = true;
+  if(!cb2)
+    {
+      TCanvas *cups = new TCanvas("cups","cups",5,5,800,800);
+      //  recomass->SetMaximum(700);
+      recomass->DrawCopy("p");
+      
+      TF1 *f1S = new TF1("f1S",CBcalc,7,11,7);
+      f1S->SetParameter(0, 1.0);     // alpha
+      f1S->SetParameter(1, 1.0);      // n
+      f1S->SetParameter(2, 9.46);      // xmean
+      f1S->SetParameter(3, 0.08);     // sigma
+      f1S->SetParameter(4, 2000.0);    // N
+      //f1S->SetParameter(4, 200.0);    // N
+      f1S->SetParameter(5,3.5);
+      f1S->SetParameter(6,0.05);
+      
+      f1S->SetParNames("alpha1S","n1S","m1S","sigma1S","N1S");
+      f1S->SetLineColor(kBlue);
+      f1S->SetLineWidth(3);
+      f1S->SetLineStyle(kDashed);
+      
+      recomass->Fit(f1S);
+      f1S->Draw("same");
+      cout << "f1S pars " <<  f1S->GetParameter(3) << "   " << f1S->GetParError(3) << endl;
+      
+      char resstr[500];
+      sprintf(resstr,"#sigma_{1S} = %.1f #pm %.1f MeV", f1S->GetParameter(3)*1000, f1S->GetParError(3)*1000);
+      TLatex *res = new TLatex(0.13,0.55,resstr);
+      res->SetNDC();
+      res->SetTextSize(0.05);
+      res->Draw();
+      
+      
+      double binw = recomass->GetBinWidth(1);
+      double renorm = 1.0/binw;   // (1 / (bin_width of data in GeV) )
+      cout << "renorm = " << renorm << endl;
+      
+      cout << "Area of f1S is " << renorm * f1S->Integral(7,11) << endl;
+      
+      // Extract ratio of yield in central gaussian to total
+      
+      TF1 *fgauss = new TF1("fgauss","gaus(0)",7,11);
+      fgauss->SetParameter(0, f1S->GetParameter(4));
+      fgauss->SetParameter(1, f1S->GetParameter(2));
+      fgauss->SetParameter(2, f1S->GetParameter(3));
+      fgauss->SetLineColor(kRed);
+      if(draw_gauss) fgauss->Draw("same");
+      
+      // calculate fraction of yield in gaussian
+      double area_fgauss =  fgauss->Integral(7,11) * renorm;
+      double area_f1S = f1S->Integral(7,11) * renorm;
+      double fraction = area_fgauss / area_f1S;
+      
+      
+      cout << "Parameters of fgauss = " << fgauss->GetParameter(0) << "  " << fgauss->GetParameter(1) << "  " << fgauss->GetParameter(2) << " Area of fgauss is " << renorm * fgauss->Integral(7,11) << " fraction in fgauss " << area_fgauss / area_f1S << endl;
+      
+      char labfrac[500];
+      sprintf(labfrac, "Gauss fraction %.2f", fraction);
+      TLatex *lab = new TLatex(0.13,0.75,labfrac);
+      lab->SetNDC();
+      lab->SetTextSize(0.05);
+      if(draw_gauss)  lab->Draw();
+    }
+  else
+    {
+      // CB2
+      
+      TCanvas *cb2 = new TCanvas("cb2","cb2",400,5,800,800);
+      recomass->DrawCopy("p");
+      
+      
+      TF1 *f2 = new TF1("f2",CrystallBall2,7,11,7);
+      
+      f2->SetParameter(0, 1000 ); 
+      f2->SetParameter(1, 9.46 ); 
+      f2->SetParameter(2, 0.1 );
+      f2->SetParameter(3, 1); 
+      f2->SetParameter(4, 3); 
+      f2->SetParameter(5, 1 ); 
+      f2->SetParameter(6, 5 ); 
+      f2->SetParNames("normalization", "mean", "sigma","alpha1","n1","alpha2","n2");
+      f2->SetParLimits(1, 9.40, 9.55);
+      f2->SetParLimits(2, 0.05, 0.15);
+      f2->SetParLimits(3, 0.120, 10);
+      f2->SetParLimits(4, 1.05, 10); 
+      f2->SetParLimits(5, 0.1, 10); 
+      f2->SetParLimits(6, 1.05, 10); 
+      
+
+      recomass->Fit(f2);
+      f2->Draw("same");
+      cout << "f2 pars " <<  f2->GetParameter(2) << "   " << f2->GetParError(2) << endl;
+
+      char resstr[500];
+      sprintf(resstr,"#sigma_{1S} = %.1f #pm %.1f MeV", f2->GetParameter(2)*1000, f2->GetParError(2)*1000);
+      TLatex *res = new TLatex(0.13,0.55,resstr);
+      res->SetNDC();
+      res->SetTextSize(0.05);
+      res->Draw();
 
 
-  TF1 *f1S = new TF1("f1S",CBcalc,7,11,7);
-  f1S->SetParameter(0, 1.0);     // alpha
-  f1S->SetParameter(1, 1.0);      // n
-  f1S->SetParameter(2, 9.46);      // xmean
-  f1S->SetParameter(3, 0.08);     // sigma
-  f1S->SetParameter(4, 2000.0);    // N
-  //f1S->SetParameter(4, 200.0);    // N
-  f1S->SetParameter(5,3.5);
-  f1S->SetParameter(6,0.05);
-
-  f1S->SetParNames("alpha1S","n1S","m1S","sigma1S","N1S");
-  f1S->SetLineColor(kBlue);
-  f1S->SetLineWidth(3);
-  f1S->SetLineStyle(kDashed);
-
-  recomass->Fit(f1S);
-  f1S->Draw("same");
-  cout << "f1S pars " <<  f1S->GetParameter(3) << "   " << f1S->GetParError(3) << endl;
-
-  char resstr[500];
-  sprintf(resstr,"#sigma_{1S} = %.1f #pm %.1f MeV", f1S->GetParameter(3)*1000, f1S->GetParError(3)*1000);
-  TLatex *res = new TLatex(0.13,0.55,resstr);
-  res->SetNDC();
-  res->SetTextSize(0.05);
-  res->Draw();
-
-
-  double binw = recomass->GetBinWidth(1);
-  double renorm = 1.0/binw;   // (1 / (bin_width of data in GeV) )
-  cout << "renorm = " << renorm << endl;
-
-  cout << "Area of f1S is " << renorm * f1S->Integral(7,11) << endl;
-
-  // Extract ratio of yield in central gaussian to total
-
-  TF1 *fgauss = new TF1("fgauss","gaus(0)",7,11);
-  fgauss->SetParameter(0, f1S->GetParameter(4));
-  fgauss->SetParameter(1, f1S->GetParameter(2));
-  fgauss->SetParameter(2, f1S->GetParameter(3));
-  fgauss->SetLineColor(kRed);
-  if(draw_gauss) fgauss->Draw("same");
-
-  // calculate fraction of yield in gaussian
-  double area_fgauss =  fgauss->Integral(7,11) * renorm;
-  double area_f1S = f1S->Integral(7,11) * renorm;
-  double fraction = area_fgauss / area_f1S;
-
-
-  cout << "Parameters of fgauss = " << fgauss->GetParameter(0) << "  " << fgauss->GetParameter(1) << "  " << fgauss->GetParameter(2) << " Area of fgauss is " << renorm * fgauss->Integral(7,11) << " fraction in fgauss " << area_fgauss / area_f1S << endl;
-
-  char labfrac[500];
-  sprintf(labfrac, "Gauss fraction %.2f", fraction);
-  TLatex *lab = new TLatex(0.13,0.75,labfrac);
-  lab->SetNDC();
-  lab->SetTextSize(0.05);
-  if(draw_gauss)  lab->Draw();
+    }
 
 
   /*
