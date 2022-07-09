@@ -28,12 +28,19 @@ void quarkonia_reconstruction_embedded()
   gStyle->SetOptTitle(1);
 
   int verbose = 0;
-  int embed_flag = 3;  // embedding flag used during Upsilon generation
+  int embed_flag = 2;  // embedding flag used during Upsilon generation
 
   // track cuts  
-  double quality_cut = 3.0;
-  double dca_cut = 0.1;
-
+  //double quality_cut = 3.0;
+  double quality_cut = 5.0;
+  //double quality_cut = 7.0;
+  double dca3dxy_cut = 0.030;
+  double dca3dz_cut = 0.030;
+  double nmaps_cut = 3;
+  double ptcut = 2.0;
+  double etacut = 1.0;
+  double ntpc_cut = 30;
+ 
   char lepton[100];
   sprintf(lepton,"electron");
   
@@ -46,7 +53,8 @@ void quarkonia_reconstruction_embedded()
   double ptmax = 10.0;
 
   TH1F* hrquality = new TH1F("hrquality", "Reconstructed track Quality", 1000, 0, 10);
-  TH1F* hrdca2d = new TH1F("hrdca2d", "Reconstructed track dca2d", 1000, 0, 0.05);
+  TH1F* hrdca3dxy = new TH1F("hrdca3dxy", "Reconstructed track dca3dxy", 1000, 0, 0.05);
+  TH1F* hrdca3dz = new TH1F("hrdca3dz", "Reconstructed track dca3dz", 1000, 0, 0.05);
   TH1F* hrpt = new TH1F("hrpt"," pT", nbpt, 0.0, ptmax);
   TH1F* hgpt = new TH1F("hgpt","g4 pT", nbpt, 0.0, ptmax);
 
@@ -86,7 +94,7 @@ void quarkonia_reconstruction_embedded()
   double nhittpcin_wt = 0;
 
     // The condor job output files -  we open them one at a time and process them
-  for(int i=0;i<2000;i++)
+  for(int i=0;i<1000;i++)
     {
       if(nrecormass > nups_requested)
 	{
@@ -96,10 +104,7 @@ void quarkonia_reconstruction_embedded()
       
       char name[500];
 
-      //sprintf(name,"/sphenix/user/frawley/macros_newTPC_june6/macros/macros/g4simulations/intt_6layers_eval_output/g4svtx_eval_%i.root_g4svtx_eval.root",i);
-      //sprintf(name,"/sphenix/user/frawley/macros_newTPC_june6/macros/macros/g4simulations/intt_4layers_eval_output/g4svtx_eval_%i.root_g4svtx_eval.root",i);
-      //sprintf(name,"/sphenix/user/frawley/macros_newTPC_june6/macros/macros/g4simulations/intt_8layers_eval_output/g4svtx_eval_%i.root_g4svtx_eval.root",i);
-      sprintf(name,"/sphenix/user/frawley/macros_newTPC_june6/macros/macros/g4simulations/intt_0layers_eval_output/g4svtx_eval_%i.root_g4svtx_eval.root",i);
+       sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/eval_output/g4svtx_eval_%i.root",i);
 
 
       /*      
@@ -224,9 +229,9 @@ void quarkonia_reconstruction_embedded()
 		}
 
 
-	      if(tembed != embed_flag)
+	      //if(tembed != embed_flag)
 		//if( tgtrackid != 1 && tgtrackid != 2)      
-		continue;
+		//continue;
 
 
 	      // we want only electrons or positrons
@@ -402,15 +407,24 @@ void quarkonia_reconstruction_embedded()
 		  nr = ir+1;
 		}
 
-	      if(rgembed != embed_flag)
-		continue;
+	      //if(rgembed != embed_flag)
+	      //continue;
+
+	      //if(rcrossing != 0)
+	      //continue;
 	  
 	      hrquality->Fill(rquality);
-	      hrdca2d->Fill(rdca2d);
+	      hrdca3dxy->Fill(rdca3dxy);
+	      hrdca3dz->Fill(rdca3dz);
 
 	      // track quality cuts	
-	      if(rquality > quality_cut || fabs(rdca2d) > dca_cut)
-		continue;
+	      if(rquality > quality_cut)  continue;
+	      if(fabs(rdca3dxy) > dca3dxy_cut) continue;
+	      if(fabs(rdca3dz) > dca3dz_cut) continue;
+	      if(rnmaps < nmaps_cut) continue;
+	      if(rpt < ptcut) continue;
+	      if(reta > etacut) continue;
+	      if(rntpc < ntpc_cut) continue;
 
 	      // make a list of electrons and positrons
 	      if(rcharge == -1)
@@ -505,12 +519,15 @@ void quarkonia_reconstruction_embedded()
   //=====================================================
 
   TCanvas *cq = new TCanvas("cq","cq",5,5,600,600 );
-  cq->Divide(1,2);
+  cq->Divide(2,2);
   cq->cd(1);
   hrquality->Draw();
   cq->cd(2);
   gPad->SetLogy(1);
-  hrdca2d->Draw();
+  hrdca3dxy->Draw();
+  cq->cd(3);
+  gPad->SetLogy(1);
+  hrdca3dz->Draw();
 
   // Mass histos
   
@@ -548,7 +565,7 @@ void quarkonia_reconstruction_embedded()
 
   char fname[500];
 
-  sprintf(fname,"root_files/ups%is_qual%.2f_dca2d%.2f.root",ups_state,quality_cut,dca_cut);
+  sprintf(fname,"root_files/ups_embed_out.root");
 
   cout << "Create output file " << fname << endl;
 
@@ -559,7 +576,8 @@ void quarkonia_reconstruction_embedded()
   g4mass_primary->Write();
   hrpt->Write();
   hrquality->Write();
-  hrdca2d->Write();
+  hrdca3dxy->Write();
+  hrdca3dz->Write();
   fout1->Close();
 
   cout << "Finished write to file " << fname << endl;

@@ -116,7 +116,7 @@
   Float_t rgpt;
   Float_t rquality;
   Float_t rchisq;
-//Float_t rchisqv;
+  Float_t rcrossing;
   Float_t rcharge;
   Float_t revent;
   Float_t rtrackid;
@@ -129,11 +129,14 @@
   Float_t rpcay;
   Float_t rpcaz;
   Float_t rdca2d;
+  Float_t rdca3dxy;
+  Float_t rdca3dz;
   Float_t rdca2dsigma;
   Float_t rnhits;
   Float_t rgnhits;
   Float_t rgembed;
-
+  Float_t reta;
+ 
   Float_t rnlmaps;
   Float_t rgnlmaps;
   Float_t rnlintt;
@@ -157,6 +160,7 @@ Float_t cemc_deta;
   TBranch* b_px;
   TBranch* b_py;
   TBranch* b_pz;
+  TBranch* b_eta;
   TBranch* b_pt;
   TBranch* b_gpx;
   TBranch* b_gpy;
@@ -167,7 +171,7 @@ Float_t cemc_deta;
   TBranch* b_gfz;
   TBranch* b_quality;
   TBranch* b_chisq;
-//TBranch* b_chisqv;
+  TBranch* b_crossing;
   TBranch* b_charge;
   TBranch* b_revent;
   TBranch* b_trackid;
@@ -179,6 +183,8 @@ Float_t cemc_deta;
   TBranch* b_pcax;
   TBranch* b_pcay;
   TBranch* b_pcaz;
+  TBranch* b_dca3dxy;
+  TBranch* b_dca3dz;
   TBranch* b_dca2d;
   TBranch* b_dca2dsigma;
   TBranch* b_rnhits;
@@ -209,6 +215,7 @@ Float_t cemc_deta;
   ntp_track->SetBranchAddress("px", &rpx);
   ntp_track->SetBranchAddress("py", &rpy);
   ntp_track->SetBranchAddress("pz", &rpz);
+  ntp_track->SetBranchAddress("eta", &reta);
   ntp_track->SetBranchAddress("pt", &rpt);
   ntp_track->SetBranchAddress("gpx", &rgpx);
   ntp_track->SetBranchAddress("gpy", &rgpy);
@@ -220,7 +227,7 @@ Float_t cemc_deta;
   ntp_track->SetBranchAddress("charge", &rcharge);
   ntp_track->SetBranchAddress("quality", &rquality);
   ntp_track->SetBranchAddress("chisq", &rchisq);
-//ntp_track->SetBranchAddress("chisqv", &rchisqv);
+  ntp_track->SetBranchAddress("crossing", &rcrossing);
   ntp_track->SetBranchAddress("event", &revent);
   ntp_track->SetBranchAddress("trackID", &rtrackid);
   ntp_track->SetBranchAddress("gtrackID", &rgtrackid);
@@ -232,6 +239,8 @@ Float_t cemc_deta;
   ntp_track->SetBranchAddress("pcay", &rpcay);
   ntp_track->SetBranchAddress("pcaz", &rpcaz);
   ntp_track->SetBranchAddress("dca2d", &rdca2d);
+  ntp_track->SetBranchAddress("dca3dxy", &rdca3dxy);
+  ntp_track->SetBranchAddress("dca3dz", &rdca3dz);
   ntp_track->SetBranchAddress("dca2dsigma", &rdca2dsigma);
   ntp_track->SetBranchAddress("nhits", &rnhits);
   ntp_track->SetBranchAddress("gnhits", &rgnhits);
@@ -251,16 +260,19 @@ Float_t cemc_deta;
   ntp_track->SetBranchAddress("ntpc", &rntpc);
   ntp_track->SetBranchAddress("gntpc", &rgntpc);
 
+/*
 // calorimeter
   ntp_track->SetBranchAddress("cemce", &cemc_e);
   ntp_track->SetBranchAddress("cemce3x3", &cemc3x3_e);
   ntp_track->SetBranchAddress("cemcdphi", &cemc_dphi);
   ntp_track->SetBranchAddress("cemcdeta", &cemc_deta);
+*/
   
   //get Branches
   b_px = ntp_track->GetBranch("px");
   b_py = ntp_track->GetBranch("py");
   b_pz = ntp_track->GetBranch("pz");
+  b_eta = ntp_track->GetBranch("eta");
   b_pt = ntp_track->GetBranch("pt");
   b_gpx = ntp_track->GetBranch("gpx");
   b_gpy = ntp_track->GetBranch("gpy");
@@ -271,7 +283,7 @@ Float_t cemc_deta;
   b_gfz = ntp_track->GetBranch("gfz");
   b_charge = ntp_track->GetBranch("charge");
   b_quality = ntp_track->GetBranch("quality");
-//b_chisqv = ntp_track->GetBranch("chisqv");
+  b_crossing = ntp_track->GetBranch("crossing");
   b_revent = ntp_track->GetBranch("event");
   b_trackid = ntp_track->GetBranch("trackID");
   b_gtrackid = ntp_track->GetBranch("gtrackID");
@@ -283,6 +295,8 @@ Float_t cemc_deta;
   b_pcay = ntp_track->GetBranch("pcay");
   b_pcaz = ntp_track->GetBranch("pcaz");
   b_dca2d = ntp_track->GetBranch("dca2d");
+  b_dca3dxy = ntp_track->GetBranch("dca3dxy");
+  b_dca3dz = ntp_track->GetBranch("dca3dz");
   b_dca2dsigma = ntp_track->GetBranch("dca2dsigma");
   b_rnhits = ntp_track->GetBranch("nhits");
   b_rnhits = ntp_track->GetBranch("gnhits");
@@ -302,11 +316,13 @@ Float_t cemc_deta;
   b_rntpc = ntp_track->GetBranch("ntpc");
   b_rgntpc = ntp_track->GetBranch("gntpc");
 
+/*
 // calorimeter
   b_rgembed = ntp_track->GetBranch("cemce");  
   b_rgembed = ntp_track->GetBranch("cemce3x3");
   b_rgembed = ntp_track->GetBranch("cemcdphi");
   b_rgembed = ntp_track->GetBranch("cemcdeta");
+*/
   
   //================================
   // Access the g4track ntuple variables

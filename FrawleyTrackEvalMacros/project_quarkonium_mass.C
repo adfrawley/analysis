@@ -1,3 +1,13 @@
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TF1.h>
+#include <TFile.h>
+#include <TROOT.h>
+#include <TStyle.h>
+#include <TChain.h>
+#include <TLorentzVector.h>
+#include <TCanvas.h>
+
 void project_quarkonium_mass()
 {
   //SetsPhenixStyle();
@@ -5,6 +15,8 @@ void project_quarkonium_mass()
   gStyle->SetOptStat(0);
   gStyle->SetOptFit(0);
   gStyle->SetOptTitle(0);
+
+  bool muons = false;  // electrons by default
 
   TFile *fout = new TFile("root_files/ntp_quarkonium_out.root","recreate");
   
@@ -20,6 +32,10 @@ void project_quarkonium_mass()
 
   TH2D *hdca2d = new TH2D("hdca2d","hdca2d", 200, 0.0, 50.0, 1000, -0.002, 0.002);
   TH2D *hpcaz = new TH2D("hpcaz","hpcaz",200, 0.0, 50.0, 1000,-0.1,0.1);
+  TH1D *hz = new TH1D("hz","hz",200, -15,15);
+  TH1D *hquality = new TH1D("hquality","hquality", 100, 0, 20);
+  TH1D *heta = new TH1D("heta","heta", 100, -1.5, 1.5);
+  TH1D *hnmaps = new TH1D("hnmaps","hnmaps", 50, 0.0, 5.0);
 
   Float_t event;
   Float_t px;
@@ -34,11 +50,17 @@ void project_quarkonium_mass()
   Float_t gvz;
   Float_t ntpc;
   Float_t nmaps;
-
-  Float_t decaymass=0.000511;
+  Float_t geta;
 
   // what do we have in the file?
-  int events_per_file = 10000;
+
+  Float_t decaymass=0.000511;
+  if(muons)
+    decaymass = 0.1057;
+
+  int upsilon_embed = 2;
+
+  static const int events_per_file = 10;
   int num_ups_per_event = 1;
  
  // what maximum yields do we want?
@@ -57,8 +79,9 @@ void project_quarkonium_mass()
   double eID_eff = 0.9;
   double tracking_eff = 0.95;
 
+  //double quality_cut = 4;
   double quality_cut = 10;
-
+  
   bool no_suppression = true;
 
   int nupsmax[3] = {0,0,0};
@@ -75,32 +98,55 @@ void project_quarkonium_mass()
 
   int nups[3] = {0,0,0};      
 
-  cout << "Upsilons requested = " << nupsmax << endl;
+  cout << "Upsilons requested (1S) = " << nupsmax[0] << endl;
+  int nfiles =1000;
 
-  for(int ifile=0;ifile<1;ifile++)
+  int count_truth_ups = 0;
+
+  for(int ifile=0;ifile<nfiles;ifile++)
     {
       if(nups[0] > nupsmax[0])
 	break;
+
       
       char name[2000];
 
-      //sprintf(name,"/sphenix/user/frawley/cluster_efficiency/macros/macros/g4simulations/eval_output/g4svtx_eval_%i.root_g4svtx_eval.root",ifile);
-      //sprintf(name,"/sphenix/user/frawley/acts_qa/macros/macros/g4simulations/eval_output_3/g4svtx_eval_%i.root_g4svtx_eval.root",ifile);
-      //sprintf(name,"/sphenix/user/frawley/acts_qa/macros/macros/g4simulations/eval_output_2/g4svtx_eval_%i.root_g4svtx_eval.root",ifile);
+      //sprintf(name,"",ifile);
 
-      //sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_10k_increase_G4sPHENIX_g4svtx_eval.root");
-      //sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_10k_nocuts_G4sPHENIX_g4svtx_eval.root");      
-      //sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_genfit_10k_nocuts_G4sPHENIX_g4svtx_eval.root")
-      //sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_genfit_10k_increase_G4sPHENIX_g4svtx_eval.root");
-      //sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_double_phi_G4sPHENIX_g4svtx_eval.root");
-      sprintf(name,"/sphenix/user/frawley/new_dec21/macros/detectors/sPHENIX/upsilons_phtpctracker_G4sPHENIX_g4svtx_eval.root");
-      
+      sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/eval_output/g4svtx_eval_%i.root",ifile);
+      //sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/constfield_MB_100pions_10ups_caseeder_clusterrejlow_truthvtx_truthsilicon_useinitvtx_eval_output/eval_out_%i.root",ifile);
+      //sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/eval_output_truth_vtx_truth_tpc_seeding_second_fit_no_micromegas_good/eval_out_%i.root",ifile);
+      //sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/eval_output_truth_vtx_truth_tpc_seeding_second_fit_no_micromegas_again_bad/eval_out_%i.root",ifile);
+
+      //sprintf(name,"/sphenix/user/frawley/new_june15/macros/detectors/sPHENIX/eval_output/eval_out_%i.root",ifile);
+      //sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/ups_only_truth_tracking_final_vtxing_no_final_fit_eval_output/eval_out_%i.root",ifile);
+
+
+
+      // sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/ups_100pions_acts_seeding_badxy_rej_noactsfit_genfit_fit_eval_output/eval_out_%i.root",ifile);
+
+      //sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/ups_100pions_acts_seeding_noactsfit_genfit_fit_2ndtry_eval_output/eval_out_%i.root",ifile);
+      //sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/ups_100pions_acts_seeding_noactsfit_genfit_fit_eval_output/eval_out_%i.root",ifile);
+
+      //sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/ups_100pions_acts_seeding_badxy_rej_noactsfit_genfit_fit_eval_output/eval_out_%i.root",ifile);
+
+
+      //char numstr[500];
+      //sprintf(numstr,"%04d",ifile);
+
+      //sprintf(name,"/sphenix/user/frawley/new_macros_april5_2021/macros/detectors/sPHENIX/eval_output//EmbedOut-pp-mb-0000000001-0%s_g4svtx_eval.root",numstr);
+      //sprintf(name,"/sphenix/user/frawley/new_macros_april5_2021/macros/detectors/sPHENIX/ups1s_pythia_5kevts_eval_output/EmbedOut-pp-mb-0000000001-0%s_g4svtx_eval.root",numstr);
+
+      //sprintf(name,"/sphenix/user/frawley/new_macros_april5_2021/macros/detectors/sPHENIX/eval_output//EmbedOut-pp-mb-0000000001-0%s_g4svtx_eval.root",numstr);
+
       cout << "Adding file number " << ifile << " with name " << name << endl;     
 
       TChain* ntp_vertex = new TChain("ntp_vertex","reco events");
       ntp_vertex->Add(name);
 
-      TChain* ntp_track = new TChain("ntp_track","reco tracks");
+      if(ntp_vertex->GetEntries() < 1) continue;
+
+      TChain* ntp_track = new TChain("ntp_gtrack","reco tracks");  // using gtrack avoids double counting due to ghosts
       ntp_track->Add(name);
 
       ntp_track->SetBranchAddress("event",&event);
@@ -116,23 +162,37 @@ void project_quarkonium_mass()
       ntp_track->SetBranchAddress("quality",&quality);
       ntp_track->SetBranchAddress("ntpc",&ntpc);
       ntp_track->SetBranchAddress("nmaps",&nmaps);
+      ntp_track->SetBranchAddress("geta",&geta);
 
       int ntracks=ntp_track->GetEntries();
 
-      // capture the dca2d and dcaz histograms for the pions
+      // capture the dca2d and dcaz histograms for the electrons
       for(int i=0;i<ntracks;i++)
 	{
 	  ntp_track->GetEntry(i);
-	  
-	  if(gembed != 1)
-	    continue;
 
-	  hdca2d->Fill(pt, dca2d);
-	  hpcaz->Fill(pt, pcaz-gvz);
+	  for(int iups = 0;iups< num_ups_per_event; iups++)
+	    {
+	      
+	      if(gembed == upsilon_embed + iups)
+		{
+		  if(fabs(gvz) < 10.0 && fabs(geta) < 1.0) 
+		    {
+		      hdca2d->Fill(pt, dca2d);
+		      hpcaz->Fill(pt, pcaz-gvz);
+		      hz->Fill(gvz);
+		      hquality->Fill(quality);
+		      heta->Fill(geta);
+		      hnmaps->Fill(nmaps);
+		    }
+		}
+	    }
 	}
 
       //events_per_file = ntp_vertex->GetEntries();
-      cout << " events in this file = " << events_per_file << endl;
+      cout << " events in this file = " << events_per_file << " tracks in this file " << ntracks << endl;
+
+      int nelec_pass[events_per_file] = {0};
 
       for(int iev = 0;iev<events_per_file;iev++)
 	{      
@@ -164,28 +224,41 @@ void project_quarkonium_mass()
 		  if(event != iev)
 		    continue;
 
-		  //cout << " iev " << iev << " event " << event << " i " << i << endl;		  
-		  
-		  //if(gembed != iups+3)
-		  if(gembed != 1)
+		  if(fabs(gvz) > 10.0) 
+		    continue; 
+
+		  if(fabs(geta) > 1.0)
 		    continue;
+
+		  /*
+		  cout << " iev " << iev << " event " << event << " ntrack " << i << " gembed " << gembed << " quality " << quality 
+		       << " ntpc " << ntpc << " nmaps " << nmaps << " charge " << charge 
+		       << " px " << px << " py " << py << " pz " << pz 
+		       << endl;		  
+		  */
+		  
+		  if(gembed != iups+upsilon_embed)
+		    continue;
+
+		  //if(nmaps <= 2)
+		  //continue;
+
+		  nelec_pass[iev]++;
 
 		  if(quality > quality_cut)
 		    continue;
 
 		  if(ntpc < 20)
-		    continue;
+		  continue;
 
-		  if(nmaps <= 1)
-		    continue;
 
 		  if(sqrt(px*px + py*py + pz*pz) < 1.0)
 		    continue;
 
-		  //		   cout << "event = " << event << " iups " << iups << " charge " << charge << " px " << px << " py " << py << " pz " << pz << " gembed " << gembed << " quality " << quality << endl;
+		  //cout << "event = " << event << " iups " << iups << " charge " << charge << " px " << px << " py " << py << " pz " << pz << " gembed " << gembed << " quality " << quality << endl;
 
 
-		  if(charge == 1)
+		  if(charge == 1 && nlept1 == 0)
 		    {
 		      nlept1++;
 
@@ -198,7 +271,7 @@ void project_quarkonium_mass()
 		      t1.SetPxPyPzE(px1,py1,pz1,E1);	  
 		    }
 
-		  if(charge == -1)
+		  if(charge == -1 && nlept2 == 0)
 		    {
 		      nlept2++;
 
@@ -211,11 +284,11 @@ void project_quarkonium_mass()
 		      t2.SetPxPyPzE(px2,py2,pz2,E2);	  
 		    }
 		  //cout << " lept1 " << lept1 << " lept2 " << lept2 << endl;
-		}
+		}  // end loop over tracks
 
 	      // calculate mass
-	      if(nlept1 == 1 && nlept2 == 1)
-	      //if(nlept1 > 0 && nlept2 > 0)
+	      //if(nlept1 == 1 && nlept2 == 1)
+	      if(nlept1 > 0 && nlept2 > 0)
 		{
 		  TLorentzVector tsum;
 		  tsum = t1+t2;
@@ -224,17 +297,20 @@ void project_quarkonium_mass()
 		  if(tsum.M() > 7 && tsum.M() < 11)
 		    {
 		      nups[istate]++;
-		      cout << " iev " << iev << " event " << event << " gembed " << gembed << " istate " << " nups[istate] " << nups[istate] << " reco mass " << tsum.M() << endl;
-		    }
-		}
-	    }
-	}
+		      cout << " iev " << iev << " event " << " upsilon_embed " << upsilon_embed << event <<  " istate " << " nups[istate] " << nups[istate] << " reco mass " << tsum.M() << endl;
+		    } // end mass cut
+		}  // end make mass
+	    } // end loop over upsilon embed numbers
+
+	  if(nelec_pass[iev] > 1) count_truth_ups ++;
+
+	}  // end loop over events
       delete ntp_track; 
       delete ntp_vertex;      
     }
 
-  cout << " requested: " << nupsmax[0] << " reconstructed: " << nups[0] << " Upsilons " << endl; 
- 
+  cout << " requested: " << nupsmax[0] << " inside acceptance " << count_truth_ups << " reconstructed: " << nups[0] << " Upsilons " << endl; 
+
   for(int istate =0; istate < 3; ++istate)
     {
       recomass[istate]->Write();
@@ -244,6 +320,10 @@ void project_quarkonium_mass()
 
   hdca2d->Write();
   hpcaz->Write();
+  hz->Write();
+  hquality->Write();
+  heta->Write();
+  hnmaps->Write();
 
   fout->Close();
 
