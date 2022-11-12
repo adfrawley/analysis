@@ -34,13 +34,13 @@
 
 #include "TDataMember.h"
 
-// The generated code does not explicitly qualifies STL entities
-namespace std {} using namespace std;
-
 // Header files passed as explicit arguments
-#include "/sphenix/u/weihuma/analysis/TrackPid/src/TrackPidAssoc.h"
+#include "../src/TrackPidAssoc.h"
 
 // Header files passed via #pragma extra_include
+
+// The generated code does not explicitly qualify STL entities
+namespace std {} using namespace std;
 
 namespace ROOT {
    static void *new_TrackPidAssoc(void *p = 0);

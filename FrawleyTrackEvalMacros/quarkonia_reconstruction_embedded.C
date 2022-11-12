@@ -32,12 +32,12 @@ void quarkonia_reconstruction_embedded()
 
   // track cuts  
   //double quality_cut = 3.0;
-  double quality_cut = 5.0;
+  double quality_cut = 10.0;
   //double quality_cut = 7.0;
-  double dca3dxy_cut = 0.030;
-  double dca3dz_cut = 0.030;
+  double dca3dxy_cut = 0.1;
+  double dca3dz_cut = 0.1;
   double nmaps_cut = 3;
-  double ptcut = 2.0;
+  double ptcut = 1.0;
   double etacut = 1.0;
   double ntpc_cut = 30;
  
@@ -94,7 +94,7 @@ void quarkonia_reconstruction_embedded()
   double nhittpcin_wt = 0;
 
     // The condor job output files -  we open them one at a time and process them
-  for(int i=0;i<1000;i++)
+  for(int i=0;i<50;i++)
     {
       if(nrecormass > nups_requested)
 	{
@@ -145,7 +145,9 @@ void quarkonia_reconstruction_embedded()
       ntp_gtrack->Add(name);
 
 
-      cout << "The ntuples contain " << ntp_vertex->GetEntries() << " events " << endl;
+      cout << "The vertex ntuple contains " << ntp_vertex->GetEntries() << " entries " << endl;
+      cout << "The track ntuple contains " << ntp_track->GetEntries() << " entries " << endl;
+      cout << "The gtrack ntuple contains " << ntp_gtrack->GetEntries() << " entries " << endl;
 
 
       // Ntuple access variables
@@ -161,8 +163,8 @@ void quarkonia_reconstruction_embedded()
 
       int nr = 0;
       int ng = 0;
-      //int nev = 1;
-      int nev = ntp_vertex->GetEntries();
+      int nev = 10;
+      //int nev = ntp_vertex->GetEntries();
 
       for(int iev=0;iev<nev;iev++)
 	{
@@ -181,7 +183,7 @@ void quarkonia_reconstruction_embedded()
 	  nhittpcin_cum += nhittpcin;
 	  nhittpcin_wt += 1.0;
 
-	  if(verbose)
+	  //if(verbose)
 	    cout 
 	      << "iev " << iev
 	      << " event " << event
@@ -206,10 +208,13 @@ void quarkonia_reconstruction_embedded()
 
 	  for(int ig=ng;ig<ng+ngtracks;ig++)
 	    {
+	      std::cout << " look for ig = " << ig << std::endl;
+
 	      int recoget1 = ntp_gtrack->GetEntry(ig);
 	      if(!recoget1)
 		{
-		  if(verbose > 0) cout << "Did not get entry for ig = " << ig << endl;
+		  //if(verbose > 0) 
+		    cout << "Did not get entry for ig = " << ig << endl;
 		  break;
 		}
 
@@ -218,13 +223,15 @@ void quarkonia_reconstruction_embedded()
 	      // when it writes out only embedded tracks
 	      if(tevent != iev)
 		{
-		  if(verbose > 0) cout << " reached new event for ig = " << ig << " tevent = " << tevent << endl; 
+		  //if(verbose > 0) 
+		    cout << " reached new event for ig = " << ig << " tevent = " << tevent << endl; 
 		  ng = ig;
 		  break;
 		}
 	      if(ig == ng+ngtracks - 1)
 		{
-		  if(verbose > 0) cout << " last time through loop for ig = " << ig << " revent = " << tevent << endl; 
+		  //if(verbose > 0) 
+		    cout << " last time through loop for ig = " << ig << " revent = " << tevent << endl; 
 		  ng = ig+1;
 		}
 
@@ -245,7 +252,7 @@ void quarkonia_reconstruction_embedded()
 		  if(ng4trevt_elec > 999)
 		    continue;
 
-		  if(verbose)
+		  //if(verbose)
 		    cout << " Found electron:" << endl
 			 << "  ig " << ig
 			 << " ng4trevt_elec " << ng4trevt_elec
@@ -265,7 +272,7 @@ void quarkonia_reconstruction_embedded()
 		  if(ng4trevt_pos > 999)
 		    continue;
 
-		  if(verbose)
+		  //if(verbose)
 		    cout << " Found positron:" << endl
 			 << "  ig " << ig
 			 << " ng4trevt_pos " << ng4trevt_pos
@@ -407,8 +414,8 @@ void quarkonia_reconstruction_embedded()
 		  nr = ir+1;
 		}
 
-	      //if(rgembed != embed_flag)
-	      //continue;
+	      if(rgembed != embed_flag)
+		continue;
 
 	      //if(rcrossing != 0)
 	      //continue;

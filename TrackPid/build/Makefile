@@ -20,7 +20,7 @@
 
 
 
-VPATH = /sphenix/u/weihuma/analysis/TrackPid/src
+VPATH = ../src
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
   case $${target_option-} in \
@@ -87,9 +87,11 @@ host_triplet = x86_64-unknown-linux-gnu
 noinst_PROGRAMS = testexternals_trackpid$(EXEEXT)
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/configure $(am__configure_deps) depcomp \
-	$(nobase_dist_pcm_DATA) $(pkginclude_HEADERS) config.guess \
-	config.sub install-sh missing ltmain.sh
+	$(top_srcdir)/configure $(am__configure_deps) \
+	$(top_srcdir)/../depcomp $(nobase_dist_pcm_DATA) \
+	$(pkginclude_HEADERS) $(top_srcdir)/../config.guess \
+	$(top_srcdir)/../config.sub $(top_srcdir)/../install-sh \
+	$(top_srcdir)/../ltmain.sh $(top_srcdir)/../missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -131,8 +133,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pcmdir)" \
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libtrackpid_la_DEPENDENCIES =
 am__objects_1 = TrackPidAssoc_Dict.lo
-am_libtrackpid_la_OBJECTS = $(am__objects_1) TrackPidAssoc.lo \
-	ElectronPid.lo
+am_libtrackpid_la_OBJECTS = $(am__objects_1) TrackPidAssoc.lo
 libtrackpid_la_OBJECTS = $(am_libtrackpid_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -159,7 +160,7 @@ am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
 am__v_at_0 = @
 am__v_at_1 = 
 DEFAULT_INCLUDES = -I. -I$(srcdir)
-depcomp = $(SHELL) $(top_srcdir)/depcomp
+depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -228,13 +229,13 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /sphenix/u/weihuma/analysis/TrackPid/src/missing aclocal-1.13
+ACLOCAL = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/TrackPid/missing aclocal-1.13
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 AR = ar
-AUTOCONF = ${SHELL} /sphenix/u/weihuma/analysis/TrackPid/src/missing autoconf
-AUTOHEADER = ${SHELL} /sphenix/u/weihuma/analysis/TrackPid/src/missing autoheader
-AUTOMAKE = ${SHELL} /sphenix/u/weihuma/analysis/TrackPid/src/missing automake-1.13
+AUTOCONF = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/TrackPid/missing autoconf
+AUTOHEADER = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/TrackPid/missing autoheader
+AUTOMAKE = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/TrackPid/missing automake-1.13
 AWK = gawk
 CC = /cvmfs/sphenix.sdcc.bnl.gov/gcc-8.3/opt/sphenix/core/gcc/8.3.0.1-0a5ad/x86_64-centos7/bin/gcc
 CCDEPMODE = depmode=gcc3
@@ -272,7 +273,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /sphenix/u/weihuma/analysis/TrackPid/src/missing makeinfo
+MAKEINFO = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/TrackPid/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /usr/bin/mkdir -p
 NM = /cvmfs/sphenix.sdcc.bnl.gov/gcc-8.3/opt/sphenix/core/binutils/2.30-e5b21/x86_64-centos7/bin/nm -B
@@ -295,10 +296,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 1.00
-abs_builddir = /sphenix/u/weihuma/analysis/TrackPid/build
-abs_srcdir = /sphenix/u/weihuma/analysis/TrackPid/src
-abs_top_builddir = /sphenix/u/weihuma/analysis/TrackPid/build
-abs_top_srcdir = /sphenix/u/weihuma/analysis/TrackPid/src
+abs_builddir = /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/TrackPid/build
+abs_srcdir = /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/TrackPid/build/../src
+abs_top_builddir = /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/TrackPid/build
+abs_top_srcdir = /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/TrackPid/build/../src
 ac_ct_AR = ar
 ac_ct_CC = /cvmfs/sphenix.sdcc.bnl.gov/gcc-8.3/opt/sphenix/core/gcc/8.3.0.1-0a5ad/x86_64-centos7/bin/gcc
 ac_ct_CXX = 
@@ -328,7 +329,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /sphenix/u/weihuma/analysis/TrackPid/src/install-sh
+install_sh = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/TrackPid/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -337,17 +338,17 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /sphenix/u/weihuma/install
+prefix = /phenix/u/frawley/git/install
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
-srcdir = /sphenix/u/weihuma/analysis/TrackPid/src
+srcdir = ../src
 sysconfdir = ${prefix}/etc
 target_alias = 
 top_build_prefix = 
 top_builddir = .
-top_srcdir = /sphenix/u/weihuma/analysis/TrackPid/src
+top_srcdir = ../src
 AUTOMAKE_OPTIONS = foreign
 
 # list of shared libraries to produce
@@ -364,8 +365,7 @@ AM_LDFLAGS = \
   -L$(OFFLINE_MAIN)/lib
 
 pkginclude_HEADERS = \
-  TrackPidAssoc.h \
-  ElectronPid.h
+  TrackPidAssoc.h 
 
 ROOTDICTS = \
   TrackPidAssoc_Dict.cc 
@@ -378,8 +378,7 @@ nobase_dist_pcm_DATA = \
 # sources for io library
 libtrackpid_la_SOURCES = \
   $(ROOTDICTS) \
-  TrackPidAssoc.cc \
-  ElectronPid.cc
+  TrackPidAssoc.cc 
 
 libtrackpid_la_LIBADD = \
   -lphool \
@@ -394,8 +393,7 @@ libtrackpid_la_LDFLAGS = \
   -lg4detectors_io \
   -lphg4hit \
   -lg4dst \
-  -lg4eval \
-  -leventmix
+  -lg4eval 
 
 
 ################################################
@@ -503,7 +501,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/ElectronPid.Plo
 include ./$(DEPDIR)/TrackPidAssoc.Plo
 include ./$(DEPDIR)/TrackPidAssoc_Dict.Plo
 include ./$(DEPDIR)/testexternals.Po

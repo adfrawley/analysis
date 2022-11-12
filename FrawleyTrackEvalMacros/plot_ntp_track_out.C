@@ -44,6 +44,7 @@ double slice_high = 6.0;
   // tuning tests
   //========== 
 
+  /*
   finvec.push_back("reorg_truth_all_100pions_analyze_out/ntp_track_out.root  ");
   legvec.push_back( "reorg truth all 100 pions");
   col.push_back(kBlue); 
@@ -52,7 +53,7 @@ double slice_high = 6.0;
   finvec.push_back("reorg_check_tpc_truth_100pions_analyze_out/ntp_track_out.root");
   legvec.push_back( "recheck truth tpc 100 pions");
   col.push_back(kBlack); 
-
+  */
 
   /*
   finvec.push_back("reorg_pythiaMB_pu_analyze_out/ntp_track_out.root  ");
@@ -65,8 +66,12 @@ double slice_high = 6.0;
   col.push_back(kBlue); 
   */
 
+
+  //finvec.push_back("reorg_pythiaMB_pu_analyze_out/ntp_track_out.root");
+  //finvec.push_back("surface_bug_analyze_out/ntp_track_out.root");
   finvec.push_back("analyze_out/ntp_track_out.root");
-  legvec.push_back( "reorg normal 100 pions");
+  //legvec.push_back( "pp extended readout mode");
+  legvec.push_back( "100 pions triggered");
   col.push_back(kRed); 
   /*
   finvec.push_back("reorg_final_100pions_analyze_out/ntp_track_out.root  ");
@@ -409,7 +414,7 @@ finvec.push_back("newbins_newcuts_nodist_100pions_analyze_out/ntp_track_out.root
   TCanvas *cqual = new TCanvas("cqual","cqual");
   cqual->Divide(nfiles,1);
 TCanvas *ccrossing = new TCanvas("ccrossing","ccrossing",5,5,800,800);
-ccrossing->Divide(nfiles,1);
+ccrossing->Divide(nfiles,2);
 TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
   ctrgvt->Divide(nfiles,1);
 
@@ -498,8 +503,21 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
       if(hcrossing_vs_gvt)
 	{
 	  std::cout << "Found hcrossing_vs_gvt " << std::endl;
-	  ccrossing->cd(i+1);
+	  ccrossing->cd(2*i+1);
+	  hcrossing_vs_gvt->GetXaxis()->SetTitle("eta");
+	  hcrossing_vs_gvt->GetYaxis()->SetTitle("gvt");
 	  hcrossing_vs_gvt->DrawCopy();
+	}
+
+      TH2D *hcrossing_vs_eta;
+      fin->GetObject("hcrossing_vs_eta",hcrossing_vs_eta);
+      if(hcrossing_vs_eta)
+	{
+	  std::cout << "Found hcrossing_vs_eta " << std::endl;
+	  ccrossing->cd(2*i+2);
+	  hcrossing_vs_eta->GetXaxis()->SetTitle("eta");
+	  hcrossing_vs_eta->GetYaxis()->SetTitle("crossing");
+	  hcrossing_vs_eta->DrawCopy();
 	}
 
       TH1D *htrgvt;

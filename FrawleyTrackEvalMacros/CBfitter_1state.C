@@ -160,7 +160,7 @@ void CBfitter_1state()
   TFile *file1S, *file2S, *file3S;
   TH1 *recomass1S, *recomass2S, *recomass3S;
 
-  bool draw_gauss = false;
+  bool draw_gauss = true;
 
   // if all are false, do AuAu 0-10%
   bool pp = false;
@@ -170,11 +170,8 @@ void CBfitter_1state()
 
   //bool do_subtracted = true;
  
-  //file1S = new TFile("root_files/ppembed_id_ntp_quarkonium_out.root");
-  //file1S = new TFile("root_files/ppembed_noid_ntp_quarkonium_out.root");
-  //file1S = new TFile("root_files/ppembed_noid_crossing0_ntp_quarkonium_out.root");
-  //file1S = new TFile("root_files/ups_embed_out.root");  
-  file1S = new TFile("root_files/pp_noid_eta10_pt20_dcaxy03_dcaz03_qual5_nmaps3_ntpc30_ups_embed_out.root");
+  //file1S = new TFile("analyze_quarkonia_out/ups_embed_out.root");
+  file1S = new TFile("root_files/ups_embed_out.root");
 
   if(!file1S)
     {
@@ -182,7 +179,6 @@ void CBfitter_1state()
       exit(1); 
     }
 
-  //recomass1S = (TH1 *)file1S->Get("recomass0";)
   recomass1S = (TH1 *)file1S->Get("recomass");
 
   TH1 *recomass = (TH1*)recomass1S->Clone("recomass1");
@@ -204,12 +200,11 @@ void CBfitter_1state()
   //int nrebin = 2;  // set to 2 to match background histo binning, but this worsens resolution slightly. Use 1 for signal fit
   recomass->Rebin(nrebin);
 
-  //  bool cb2 = true;
+  //bool cb2 = true;
   bool cb2 = false;
   if(!cb2)
     {
       TCanvas *cups = new TCanvas("cups","cups",5,5,800,800);
-      //  recomass->SetMaximum(700);
       recomass->DrawCopy("p");
       
       TF1 *f1S = new TF1("f1S",CBcalc,7,11,7);
@@ -217,20 +212,10 @@ void CBfitter_1state()
       f1S->SetParameter(1, 5.0);      // n
       f1S->SetParameter(2, 9.46);      // xmean
       f1S->SetParameter(3, 0.08);     // sigma
-      //f1S->SetParameter(4, 2000.0);    // N
-      f1S->SetParameter(4, 200.0);    // N
+      f1S->SetParameter(4, 100.0);    // N
       f1S->SetParameter(5, 150.0);
       f1S->SetParameter(6,-1.0); 
-      /*
-     f1S->SetParameter(0, 0.5);     // alpha
-      f1S->SetParameter(1, 5.0);      // n
-      f1S->SetParameter(2, 9.46);      // xmean
-      f1S->SetParameter(3, 0.08);     // sigma
-      //f1S->SetParameter(4, 2000.0);    // N
-      f1S->SetParameter(4, 200.0);    // N
-      f1S->SetParameter(5, 150.0);
-      f1S->SetParameter(6,-1.0);
-      */
+
       f1S->SetParNames("alpha1S","n1S","m1S","sigma1S","N1S");
       f1S->SetLineColor(kBlue);
       f1S->SetLineWidth(3);
@@ -275,12 +260,12 @@ void CBfitter_1state()
 	fgauss->Draw("same");
       
       // calculate fraction of yield in gaussian
-      double area_fgauss =  fgauss->Integral(7,11) * renorm;
-      double area_f1S = f1S->Integral(7,11) * renorm;
+      double area_fgauss =  renorm * fgauss->Integral(7,11);
+      double area_f1S = renorm * f1S->Integral(7,11);
       double fraction = area_fgauss / area_f1S;
       
       
-      cout << "Parameters of fgauss = " << fgauss->GetParameter(0) << "  " << fgauss->GetParameter(1) << "  " << fgauss->GetParameter(2) << " Area of fgauss is " << renorm * fgauss->Integral(7,11) << " fraction in fgauss " << area_fgauss / area_f1S << endl;
+      cout << "Parameters of fgauss = " << fgauss->GetParameter(0) << "  " << fgauss->GetParameter(1) << "  " << fgauss->GetParameter(2) << " Area of fgauss is " << renorm * fgauss->Integral(7,11) << " fraction in fgauss " << fraction << endl;
       
       char labfrac[500];
       sprintf(labfrac, "Gauss fraction %.2f", fraction);
@@ -295,14 +280,12 @@ void CBfitter_1state()
       
       TCanvas *CB2 = new TCanvas("CB2","CB2",400,5,800,800);
       recomass->DrawCopy("p");
-      
-      
+            
       TF1 *f2 = new TF1("f2",CrystallBall2,7,11,7);
       
-      //f2->SetParameter(0, 100 ); 
-      f2->SetParameter(0, 500 ); 
+      f2->SetParameter(0, 1000 ); 
       f2->SetParameter(1, 9.46 ); 
-      f2->SetParameter(2, 0.13 );
+      f2->SetParameter(2, 0.1 );
       f2->SetParameter(3, 1); 
       f2->SetParameter(4, 3); 
       f2->SetParameter(5, 1 ); 
@@ -314,8 +297,7 @@ void CBfitter_1state()
       f2->SetParLimits(3, 0.120, 10);
       f2->SetParLimits(4, 1.01, 10); 
       f2->SetParLimits(5, 0.1, 10); 
-      f2->SetParLimits(6, 1.01, 10); 
-      
+      f2->SetParLimits(6, 1.01, 10);       
 
       recomass->Fit(f2);
       f2->Draw("same");
@@ -349,7 +331,7 @@ void CBfitter_1state()
       double fraction = area_fgauss / area_f2;
       
       
-      cout << "Parameters of fgauss = " << fgauss->GetParameter(0) << "  " << fgauss->GetParameter(1) << "  " << fgauss->GetParameter(2) << " Area of fgauss is " << renorm * fgauss->Integral(7,11) << " fraction in fgauss " << area_fgauss / area_f2 << endl;
+      cout << "Parameters of fgauss = " << fgauss->GetParameter(0) << "  " << fgauss->GetParameter(1) << "  " << fgauss->GetParameter(2) << " Area of fgauss is " << renorm * fgauss->Integral(7,11) << " fraction in fgauss " << fraction << endl;
       
       char labfrac[500];
       sprintf(labfrac, "Gauss fraction %.2f", fraction);

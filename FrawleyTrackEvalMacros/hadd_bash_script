@@ -1,0 +1,3 @@
+export PATH=/path/to/root/bin:$PATH
+hadd -f -k analyze_out/ntp_track_out.root analyze_out/ntp_track_out_{0..499}.root
+

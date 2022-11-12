@@ -1,0 +1,2 @@
+export PATH=/path/to/root/bin:$PATH
+hadd -f -k analyze_quarkonia_out/ups_embed_out.root analyze_quarkonia_out/ups_embed_out_{0..199}.root

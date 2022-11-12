@@ -34,13 +34,13 @@
 
 #include "TDataMember.h"
 
-// The generated code does not explicitly qualifies STL entities
-namespace std {} using namespace std;
-
 // Header files passed as explicit arguments
-#include "/sphenix/u/weihuma/analysis/ElectronID/src/ElectronID.h"
+#include "../ElectronID.h"
 
 // Header files passed via #pragma extra_include
+
+// The generated code does not explicitly qualify STL entities
+namespace std {} using namespace std;
 
 namespace ROOT {
    static TClass *ElectronID_Dictionary();

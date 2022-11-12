@@ -20,7 +20,7 @@
 
 
 
-VPATH = /sphenix/u/weihuma/analysis/ElectronID/src
+VPATH = ..
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
   case $${target_option-} in \
@@ -229,13 +229,13 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /sphenix/u/weihuma/analysis/ElectronID/src/missing aclocal-1.13
+ACLOCAL = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/ElectronID/src/missing aclocal-1.13
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 AR = ar
-AUTOCONF = ${SHELL} /sphenix/u/weihuma/analysis/ElectronID/src/missing autoconf
-AUTOHEADER = ${SHELL} /sphenix/u/weihuma/analysis/ElectronID/src/missing autoheader
-AUTOMAKE = ${SHELL} /sphenix/u/weihuma/analysis/ElectronID/src/missing automake-1.13
+AUTOCONF = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/ElectronID/src/missing autoconf
+AUTOHEADER = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/ElectronID/src/missing autoheader
+AUTOMAKE = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/ElectronID/src/missing automake-1.13
 AWK = gawk
 CC = /cvmfs/sphenix.sdcc.bnl.gov/gcc-8.3/opt/sphenix/core/gcc/8.3.0.1-0a5ad/x86_64-centos7/bin/gcc
 CCDEPMODE = depmode=gcc3
@@ -273,7 +273,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /sphenix/u/weihuma/analysis/ElectronID/src/missing makeinfo
+MAKEINFO = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/ElectronID/src/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /usr/bin/mkdir -p
 NM = /cvmfs/sphenix.sdcc.bnl.gov/gcc-8.3/opt/sphenix/core/binutils/2.30-e5b21/x86_64-centos7/bin/nm -B
@@ -296,10 +296,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 1.00
-abs_builddir = /sphenix/u/weihuma/analysis/ElectronID/src/build
-abs_srcdir = /sphenix/u/weihuma/analysis/ElectronID/src
-abs_top_builddir = /sphenix/u/weihuma/analysis/ElectronID/src/build
-abs_top_srcdir = /sphenix/u/weihuma/analysis/ElectronID/src
+abs_builddir = /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/ElectronID/src/build
+abs_srcdir = /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/ElectronID/src/build/..
+abs_top_builddir = /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/ElectronID/src/build
+abs_top_srcdir = /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/ElectronID/src/build/..
 ac_ct_AR = ar
 ac_ct_CC = /cvmfs/sphenix.sdcc.bnl.gov/gcc-8.3/opt/sphenix/core/gcc/8.3.0.1-0a5ad/x86_64-centos7/bin/gcc
 ac_ct_CXX = 
@@ -329,7 +329,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /sphenix/u/weihuma/analysis/ElectronID/src/install-sh
+install_sh = ${SHELL} /gpfs/mnt/gpfs02/sphenix/user/frawley/analysis/analysis/ElectronID/src/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -338,17 +338,17 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /sphenix/u/weihuma/install
+prefix = /phenix/u/frawley/git/install
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
-srcdir = /sphenix/u/weihuma/analysis/ElectronID/src
+srcdir = ..
 sysconfdir = ${prefix}/etc
 target_alias = 
 top_build_prefix = 
 top_builddir = .
-top_srcdir = /sphenix/u/weihuma/analysis/ElectronID/src
+top_srcdir = ..
 AUTOMAKE_OPTIONS = foreign
 
 # list of shared libraries to produce
@@ -388,12 +388,14 @@ libelectronid_la_LIBADD = \
 libelectronid_la_LDFLAGS = \
   -L$(libdir) \
   -L$(OFFLINE_MAIN)/lib \
+  -L$(ROOTSYS)/lib \
   -lcalo_io \
   -lfun4all \
   -lg4detectors_io \
   -lphg4hit \
   -lg4dst \
   -lg4eval \
+  -lTMVA \
   -ltrackpid
 
 
