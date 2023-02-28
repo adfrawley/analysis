@@ -123,7 +123,7 @@ void project_arbitrary_mass()
   for(int ifile = 0; ifile < nfiles; ifile++)
     { 
       char name[2000];
-      sprintf(name,"/sphenix/user/rboucher43/macros/detectors/sPHENIX/eval_output/g4svtx_eval_%i.root",ifile);
+      sprintf(name,"/sphenix/user/frawley/jan20_2023/macros/detectors/sPHENIX/eval_out/proc_%i_g4svtx_eval.root",ifile);
 
       TChain* ntp_vertex = new TChain("ntp_vertex","reco events");
       ntp_vertex->Add(name);
@@ -252,6 +252,9 @@ void project_arbitrary_mass()
 	  if(quality > quality_cut)
 	    continue;
 	  
+	  if(nmaps < 3)
+	    continue;
+
 	  if(ntpc < 20)
 	    continue;
 

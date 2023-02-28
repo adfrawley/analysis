@@ -1,8 +1,6 @@
 void plot_arbitrary_mass()
 {
   TFile fin("ntp_mass_out.root");
-  //TFile fin("ntp_mass_out_kptcut_100_100.root");
-  //TFile fin("ntp_mass_out_kptcut_500_500.root");
 
   TH1D *recomass, *recopt, *recopath,*recoctau;
   TH2D *recoeta, *recophi, *recodca,*recopath_z;
