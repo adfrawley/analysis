@@ -42,7 +42,7 @@ void analyze_evaluator_tracks(){
   TChain* ntp_gtrack = new TChain("ntp_gtrack","g4 tracks");
   TChain* ntp_vertex = new TChain("ntp_vertex","track vertex");
 
-  int n_list = 120;
+  int n_list = 150;
   int nstart = 0;
   int ifile = 0; 
   
@@ -58,7 +58,7 @@ void analyze_evaluator_tracks(){
 
       // Running directories
 
-      sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/eval_output/eval_out_%i.root",i);
+      sprintf(name,"/sphenix/user/frawley/jan20_2023/macros/detectors/sPHENIX/eval_out/proc_%i_g4svtx_eval.root",i);
 
       // S&C review
       //==========

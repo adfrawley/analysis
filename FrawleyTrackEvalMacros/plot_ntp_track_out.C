@@ -24,7 +24,7 @@ void plot_ntp_track_out()
 
   bool pp_mode = false;
 
- double ptmax = 20.0;
+ double ptmax = 10.0;
 double slice_low = 5.0;
 double slice_high = 6.0;
  if(pp_mode)
@@ -67,17 +67,15 @@ double slice_high = 6.0;
   */
 
 
-  //finvec.push_back("reorg_pythiaMB_pu_analyze_out/ntp_track_out.root");
-  //finvec.push_back("surface_bug_analyze_out/ntp_track_out.root");
-  finvec.push_back("analyze_out/ntp_track_out.root");
-  //legvec.push_back( "pp extended readout mode");
-  legvec.push_back( "100 pions triggered");
+  finvec.push_back("root_files/perturb4_150files_ntp_track_out.root");
+  legvec.push_back( "100 pions MVTX/INTT 40 15 TPC/TPOT 150");
   col.push_back(kRed); 
-  /*
+
+
   finvec.push_back("reorg_final_100pions_analyze_out/ntp_track_out.root  ");
   legvec.push_back( "reorg 100 pions");
   col.push_back(kViolet); 
-  */
+
 
 
   /*
