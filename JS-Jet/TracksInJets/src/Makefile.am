@@ -11,28 +11,22 @@ AM_LDFLAGS = \
   -L$(OFFLINE_MAIN)/lib64
 
 pkginclude_HEADERS = \
-  massRecoAnalysis.h
+  TracksInJets.h
 
 lib_LTLIBRARIES = \
-  libmassRecoAnalysis.la
+  libTracksInJets.la
 
-libmassRecoAnalysis_la_SOURCES = \
-  massRecoAnalysis.cc
+libTracksInJets_la_SOURCES = \
+  TracksInJets.cc
 
-libmassRecoAnalysis_la_LIBADD = \
+libTracksInJets_la_LIBADD = \
   -lphool \
+  -lSubsysReco \
   -lfun4all \
+  -lg4dst \
   -lg4eval \
-  -lg4eval_io \
-  -lphg4hit \
-  -lg4detectors_io \
-  -ltrack_io \
-  -ltrackbase_historic_io \
-  -ltpc_io \
-  -lmvtx_io \
-  -lintt_io \
-  -lmicromegas_io \
-  -lSubsysReco
+  -lg4jets_io \
+  -lg4jets
 
 BUILT_SOURCES = testexternals.cc
 
@@ -40,7 +34,7 @@ noinst_PROGRAMS = \
   testexternals
 
 testexternals_SOURCES = testexternals.cc
-testexternals_LDADD   = libmassRecoAnalysis.la
+testexternals_LDADD   = libTracksInJets.la
 
 testexternals.cc:
 	echo "//*** this is a generated file. Do not commit, do not edit" > $@

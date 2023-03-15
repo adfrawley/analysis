@@ -12,18 +12,29 @@
 #include <phool/PHRandomSeed.h>
 #include <phool/recoConsts.h>
 
+#include <g4jets/FastJetAlgo.h>
+#include <g4jets/JetReco.h>
+#include <g4jets/TowerJetInput.h>
+#include <g4jets/TruthJetInput.h>
+
 #include <g4centrality/PHG4CentralityReco.h>
 
+#include <jetbackground/CopyAndSubtractJets.h>
+#include <jetbackground/DetermineTowerBackground.h>
+#include <jetbackground/FastJetAlgoSub.h>
+#include <jetbackground/RetowerCEMC.h>
+#include <jetbackground/SubtractTowers.h>
+#include <jetbackground/SubtractTowersCS.h>
 
 #include <HIJetReco.C>
 
+#include <uevsetacentrality/UEvsEtaCentrality.h>
 
-#include <jetvalidation/JetValidation.h>
 
 R__LOAD_LIBRARY(libfun4all.so)
 R__LOAD_LIBRARY(libg4jets.so)
 R__LOAD_LIBRARY(libjetbackground.so)
-R__LOAD_LIBRARY(libJetValidation.so)
+R__LOAD_LIBRARY(libUEvsEtaCentrality.so)
 R__LOAD_LIBRARY(libg4centrality.so)
 R__LOAD_LIBRARY(libg4dst.so)
 
@@ -31,7 +42,7 @@ R__LOAD_LIBRARY(libg4dst.so)
 #endif
 
 
-void Fun4All_JetVal(const char *filelisttruth = "dst_truth_jet.list",
+void  Fun4All_UE_v2_Psi2(const char *filelistbbc = "dst_bbc_g4hit.list",
                      const char *filelistcalo = "dst_calo_cluster.list",  
                      const char *outname = "outputest.root")
 {
@@ -48,20 +59,14 @@ void Fun4All_JetVal(const char *filelisttruth = "dst_truth_jet.list",
   cent->GetCalibrationParameters().ReadFromFile("centrality", "xml", 0, 0, string(getenv("CALIBRATIONROOT")) + string("/Centrality/"));
   se->registerSubsystem( cent );
 
+  
   HIJetReco();
- 
 
-  JetValidation *myJetVal = new JetValidation("AntiKt_Tower_r04_Sub1", "AntiKt_Truth_r04", outname);
-
-  myJetVal->setPtRange(5, 100);
-  myJetVal->setEtaRange(-1.1, 1.1);
-  myJetVal->doUnsub(1);
-  myJetVal->doTruth(1);
-  myJetVal->doSeeds(1);
+  UEvsEtaCentrality *myJetVal = new UEvsEtaCentrality();
   se->registerSubsystem(myJetVal);
   
-  Fun4AllInputManager *intrue = new Fun4AllDstInputManager("DSTtruth");
-  intrue->AddListFile(filelisttruth,1);
+  Fun4AllInputManager *intrue = new Fun4AllDstInputManager("DSTbbc");
+  intrue->AddListFile(filelistbbc,1);
   se->registerInputManager(intrue);
 
   Fun4AllInputManager *in2 = new Fun4AllDstInputManager("DSTcalo");
@@ -71,7 +76,7 @@ void Fun4All_JetVal(const char *filelisttruth = "dst_truth_jet.list",
   
   se->run(-1);
   se->End();
-
+  se->PrintTimer();
   gSystem->Exit(0);
   return 0;
 
