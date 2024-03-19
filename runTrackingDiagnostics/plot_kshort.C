@@ -1,28 +1,31 @@
 #include <cmath>
-#include <TFile.h>
-#include <TNtuple.h>
+#include <TH1D.h>
 #include <TH2D.h>
+#include <TF1.h>
+#include <TFile.h>
+#include <TROOT.h>
+#include <TStyle.h>
+#include <TChain.h>
 #include <TCut.h>
+#include <TNtuple.h>
+#include <TLorentzVector.h>
+#include <TCanvas.h>
+#include<TLorentzVector.h>
 #include <Eigen/Dense>
 
 void plot_kshort()
 {
-  TFile fin("eval_output/misaligned_mar15.root");
+  Float_t decaymass = 0.13957;
+
+  //TFile fin("eval_output/misaligned_mar15.root");
   //TFile fin("hijing_eval_output/combined_ntp_mass_out.root");
   //TFile fin("old_combined_ntp_mass_out/feb15.root");
-  
+  TFile fin("/sphenix/tg/tg01/hf/frawley/kshort1/kshort_combined.root");
 
   TNtuple *ntuple;
   fin.GetObject("ntp_reco_info",ntuple);
 
-
-  /* Below are values in massRecoAnalysis ntuple 3/6/23
-"ntp_reco_info","decay_pairs","x1:y1:z1:px1:py1:pz1:dca3dxy1:dca3dz1:phi1:pca_rel1_x:pca_rel1_y:pca_rel1_z:eta1:charge1:tpcClusters_1:x2:y2:z2:px2:py2:pz2:dca3dxy2:dca3dz2:phi2:pca_rel2_x:pca_rel2_y:pca_rel2_z:eta2:charge2:tpcClusters_2:vertex_x:vertex_y:vertex_z:pair_dca:invariant_mass:invariant_pt:pathlength_x:pathlength_y:pathlength_z:pathlength:rapidity:pseudorapidity:projected_pos1_x:projected_pos1_y:projected_pos1_z:projected_pos2_x:projected_pos2_y:projected_pos2_z:projected_mom1_x:projected_mom1_y:projected_mom1_z:projected_mom2_x:projected_mom2_y:projected_mom2_z:projected_pca_rel1_x:projected_pca_rel1_y:projected_pca_rel1_z:projected_pca_rel2_x:projected_pca_rel2_y:projected_pca_rel2_z:projected_pair_dca:projected_pathlength_x:projected_pathlength_y:projected_pathlength_z:projected_pathlength:quality1:quality2:cosThetaReco"
-  */
-
-
-
-  float invariant_mass;
+  float org_invariant_mass;
   float projected_pathlength_x;
   float projected_pathlength_y;
   float projected_pathlength_z;
@@ -37,7 +40,7 @@ void plot_kshort()
   float projected_mom2_y;
   float projected_mom2_z;
   float projected_pair_dca;
-  float invariant_pt;
+  float org_invariant_pt;
   float quality1;
   float quality2;
 
@@ -47,7 +50,7 @@ void plot_kshort()
   float dca3dz2;
 
 
-  ntuple->SetBranchAddress("invariant_mass",&invariant_mass);
+  ntuple->SetBranchAddress("invariant_mass",&org_invariant_mass);
   ntuple->SetBranchAddress("projected_pathlength_x",&projected_pathlength_x);
   ntuple->SetBranchAddress("projected_pathlength_y",&projected_pathlength_y);
   ntuple->SetBranchAddress("projected_pathlength_z",&projected_pathlength_z);
@@ -62,7 +65,7 @@ void plot_kshort()
   ntuple->SetBranchAddress("projected_mom2_y",&projected_mom2_y);
   ntuple->SetBranchAddress("projected_mom2_z",&projected_mom2_z);
   ntuple->SetBranchAddress("projected_pair_dca",&projected_pair_dca);
-  ntuple->SetBranchAddress("invariant_pt",&invariant_pt);
+  ntuple->SetBranchAddress("invariant_pt",&org_invariant_pt);
   ntuple->SetBranchAddress("quality1",&quality1);
   ntuple->SetBranchAddress("quality2",&quality2);
   ntuple->SetBranchAddress("dca3dxy1",&dca3dxy1);
@@ -72,7 +75,6 @@ void plot_kshort()
 
 
 
-  //TH2D *decay_length = new TH2D("decay_length","",5000,-1,1,5000,0,10);
   //kfparticle comaprison cuts
   //TCut cut = "K0_mass>0.1&&track_1_IP_xy>0.02&&track_2_IP_xy>0.02&&abs(track_1_track_2_DCA)<0.05&&K0_pT>0.1&&abs(K0_x)>0.1&&abs(K0_y)>0.1"; 
   //TCut cut = "abs(track_1_IP_xy)>0.02&&abs(track_2_IP_xy)>0.02&&abs(K0_decayLength)>0.2";
@@ -102,6 +104,26 @@ void plot_kshort()
   for(int i=0; i<entries; ++i)
     {
       ntuple->GetEntry(i);
+
+      // recalculate invariant mass using track states at decay vertex
+
+      TLorentzVector t1;
+      //Float_t E1 = sqrt(pow(vmomx1,2) + pow(vmomy1,2) + pow(vmomz1,2) + pow(decaymass,2));
+      Float_t E1 = sqrt(pow(projected_mom1_x,2) + pow(projected_mom1_y,2) + pow(projected_mom1_z,2) + pow(decaymass,2));
+      t1.SetPxPyPzE(projected_mom1_x, projected_mom1_y, projected_mom1_z,E1);
+				      
+      TLorentzVector t2;
+      Float_t E2 = sqrt(pow(projected_mom2_x,2) + pow(projected_mom2_y,2) + pow(projected_mom2_z,2) + pow(decaymass,2));
+      t2.SetPxPyPzE(projected_mom2_x, projected_mom2_y, projected_mom2_z,E2);
+
+      TLorentzVector tsum;
+      tsum = t1+t2;
+
+      double invariant_mass = tsum.M();
+      double invariant_eta = tsum.Eta();
+      double invariant_phi = tsum.Phi();
+      double invariant_pt = tsum.Pt();
+
 
       Eigen::Vector3f mom1(projected_mom1_x,projected_mom1_y,projected_mom1_z);
       Eigen::Vector3f mom2(projected_mom2_x,projected_mom2_y,projected_mom2_z);

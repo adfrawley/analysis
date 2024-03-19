@@ -70,7 +70,9 @@ void SecVertPlotter_conversions()
   gStyle->SetOptTitle(1);
 
   //TFile *fin = new TFile("as_merged_eval_out/combined_eval_out.root");
-  TFile *fin = new TFile("/sphenix/user/frawley/jan20_2023/macros/detectors/sPHENIX/repo_eval_out/combined_eval_out.root");
+  //TFile *fin = new TFile("/sphenix/user/frawley/march17_2023/macros/detectors/sPHENIX/eval_output/combined_secvert_ntuple.root");
+  //TFile *fin = new TFile("/sphenix/user/frawley/march17_2023/macros/detectors/sPHENIX/pythia_masscutpt1_combined_secvert_ntuple.root");
+  TFile *fin = new TFile("/sphenix/user/frawley/march17_2023/macros/detectors/sPHENIX/eval_output/pi0_combined_secvert_ntuple.root");
 
   TNtuple *ntp;
   fin->GetObject("ntp", ntp);
@@ -146,11 +148,17 @@ void SecVertPlotter_conversions()
 
   ntp->SetBranchAddress("pair_dca",&pair_dca);
 
+  double quality_cut = 4.0;
+  double dca3dxy_cut = 0.02;
+  double dca3dz_cut = 0.02;
+
   double min_mass = 0.0;
   double max_mass = 0.2;
   int nmassbins = 1000;
   double sig_lo = 0.0;
   double sig_hi = 0.03;
+  double costheta_min = 0.9985;
+  double min_path = 0.5;
 
   TH1D *hmass_si = new TH1D("hmass_si","",nmassbins,min_mass,max_mass);
   hmass_si->GetXaxis()->SetTitle("Invariant mass (GeV/c^2)");
@@ -173,6 +181,12 @@ void SecVertPlotter_conversions()
   TH2D *hdecaypos = new TH2D("hdecaypos","decay radius",200, -40, 40, 200,-40,40);
   hdecaypos->GetXaxis()->SetTitle("decay X (cm)");
   hdecaypos->GetYaxis()->SetTitle("decay Y (cm)");
+  TH1D *hpair_dca = new TH1D("hpair_dca","Pair DCA",200,-0.2,0.2);
+  hpair_dca->GetXaxis()->SetTitle("cm");
+  TH1D *hcostheta = new TH1D("hcostheta","cos(theta)",200,0.997,1.0);
+  hcostheta->GetXaxis()->SetTitle("cos(theta)");
+  TH1D *hquality = new TH1D("hquality","track quality",100,0.0,12.0);
+  hquality->GetXaxis()->SetTitle("quality");
 
   int entries = ntp->GetEntries();
   for(int i=0;i<entries;++i)
@@ -180,11 +194,11 @@ void SecVertPlotter_conversions()
     {
       ntp->GetEntry(i);
 
-
-      
+      hquality->Fill(quality1);
+      hquality->Fill(quality2);
 
       // single track cuts
-      if(quality1 > 5 || quality2 > 5) continue;
+      if(quality1 > quality_cut || quality2 > quality_cut) continue;
       if(tpcClusters_1 < 40 || tpcClusters_2 < 40) continue;
       // track pair cut
       if(fabs(pair_dca) > 0.2) continue;
@@ -211,22 +225,25 @@ void SecVertPlotter_conversions()
       Eigen::Vector3d mom2(vmomx2,vmomy2, vmomz2);
       Eigen::Vector3d invariant_mom(tsum(0), tsum(1), tsum(2));
 
-      //Eigen::Vector3d PCA1, PCA2;
-      //double dca = 999.0;
-      //findPcaTwoLines(pos1, mom1, pos2, mom2, dca, PCA1, PCA2);
-      //if(dca == 999.0) continue;
       Eigen::Vector3d PCA = (pos1+pos2)/2.0;
+      /*  
+	  Eigen::Vector3d pca_rel_1(pca_relx_1,pca_rely_1,pca_relz_1);
+	  Eigen::Vector3d pca_rel_2(pca_relx_2,pca_rely_2,pca_relz_2);
+	  Eigen::Vector3d PCA = (pca_rel_1+pca_rel_2)/2.0;
+      */
 
       // difference from the event vertex
       Eigen::Vector3d VTX(vertex_x, vertex_y, vertex_z);  // asssociated event vertex
       Eigen::Vector3d path = PCA - VTX;
+
+      if(path.norm() < min_path) continue;
 
       double decay_radius = sqrt( pow(PCA(0),2) + pow(PCA(1),2) );
 
       // Angle between path vector and reco pair momentum vector
       double costheta = path.dot(invariant_mom) / (path.norm() * invariant_mom.norm());
       //      std::cout << " costheta " << costheta << std::endl;
-      if(costheta < 0.999) continue;
+      if(costheta < costheta_min) continue;
       
       // selects "decays" with zero mass
       if(fabs(eta1-eta2) > 0.05) continue; 
@@ -256,8 +273,8 @@ void SecVertPlotter_conversions()
       }
 	*/
       // no silicon case
-      if( (fabs(dca3dxy1) > 0.02 && fabs(dca3dxy2) > 0.02)
-	  && (fabs(dca3dz1) > 0.02 && fabs(dca3dz2) > 0.02) )
+      if( (fabs(dca3dxy1) > dca3dxy_cut && fabs(dca3dxy2) > dca3dxy_cut)
+	  && (fabs(dca3dz1) > dca3dz_cut && fabs(dca3dz2) > dca3dz_cut) )
 	{
 	  hptmass->Fill(invariant_pt,invariant_mass);
 	  if(invariant_mass > sig_lo && invariant_mass < sig_hi)
@@ -275,6 +292,8 @@ void SecVertPlotter_conversions()
 		      hdecaypos->Fill( PCA(0), PCA(1));
 		      hpteta->Fill(invariant_eta, invariant_pt);
 		      hinv_eta->Fill(invariant_eta);
+		      hpair_dca->Fill(pair_dca);
+		      hcostheta->Fill(costheta);
 		    }
 		}
 	    }
@@ -398,5 +417,14 @@ void SecVertPlotter_conversions()
   hinv_eta->Draw();
   ceta->cd(2);
   hpteta->Draw();
+
+  TCanvas *cpdca = new TCanvas("dpdca","",200,200,600,600);
+  hpair_dca->Draw();
+
+  TCanvas *ccostheta = new TCanvas("ccostheta","",250,250,600,600);
+  hcostheta->Draw();
+
+  TCanvas *cquality = new TCanvas("cquality","",300,300,600,600);
+  hquality->Draw();
 
 }

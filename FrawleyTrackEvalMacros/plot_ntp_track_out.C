@@ -17,19 +17,25 @@
 void plot_ntp_track_out()
 {
 
+
+  //  gROOT->LoadMacro("sPhenixStyle.C");
+  //SetsPhenixStyle();
+
+
   gROOT->SetStyle("Plain");
-  gStyle->SetOptTitle(0);
+  gStyle->SetOptTitle(1);
   gStyle->SetOptStat(0);
   gStyle->SetOptFit(0);
 
-  bool pp_mode = false;
+
+  bool pp_mode = true;
 
  double ptmax = 10.0;
 double slice_low = 5.0;
 double slice_high = 6.0;
  if(pp_mode)
    {
-     ptmax = 10.0;
+     ptmax = 4.0;
      slice_low = 1.0;
      slice_high = 2.0;
    }
@@ -66,16 +72,16 @@ double slice_high = 6.0;
   col.push_back(kBlue); 
   */
 
-
+  /*
   finvec.push_back("root_files/perturb4_150files_ntp_track_out.root");
   legvec.push_back( "100 pions MVTX/INTT 40 15 TPC/TPOT 150");
   col.push_back(kRed); 
-
-
+  */
+  /*
   finvec.push_back("reorg_final_100pions_analyze_out/ntp_track_out.root  ");
   legvec.push_back( "reorg 100 pions");
   col.push_back(kViolet); 
-
+  */
 
 
   /*
@@ -293,17 +299,30 @@ finvec.push_back("newbins_newcuts_nodist_100pions_analyze_out/ntp_track_out.root
   */
 
   /*
-  finvec.push_back("root_files/PRcheck_pythia_single_dca80_qual5_nmaps3_equal_wt_pair_outlier_rejection_100_ntp_track_out.root");
-  legvec.push_back( "Pythia jet vertexing PRcheck");
-  col.push_back(kBlue); 
-  */
+    // QM23 vertexing poster fig 2
+  finvec.push_back("root_files/pythia_D0_piK_5GeVmin_ntp_track_out.root");
+  legvec.push_back( "Pythia D^{0} event");
+  col.push_back(kRed); 
 
-  /*  
-  // Best Rave reference
-  finvec.push_back("root_files/pythia_single_Rave_nmaps3_ntp_track_out.root");
-  legvec.push_back( "Pythia jet Rave nmaps3");
+  //finvec.push_back("root_files/ntp_track_out.root");
+  finvec.push_back("root_files/pythia_jet_10GeVmin_ntp_track_out.root");
+  legvec.push_back( "Pythia jet event");
   col.push_back(kBlack); 
   */
+
+
+  /*
+  // QM23 vertexing poster fig 1 
+  finvec.push_back("root_files/PRcheck_pythia_single_dca80_qual5_nmaps3_equal_wt_pair_outlier_rejection_100_ntp_track_out.root");
+  legvec.push_back( "sPHENIX");
+  col.push_back(kRed); 
+
+  // Best Rave reference
+  finvec.push_back("root_files/pythia_single_Rave_nmaps3_ntp_track_out.root");
+  legvec.push_back( "Rave     ");
+  col.push_back(kBlack); 
+  */
+
 
   /*
   // qual 4, no change from qual 5
@@ -318,6 +337,32 @@ finvec.push_back("newbins_newcuts_nodist_100pions_analyze_out/ntp_track_out.root
   col.push_back(kBlack); 
   */
 
+  /*
+  finvec.push_back("root_files/pythia_dist_mb_pp_20ms_ntp_track_out.root");
+  legvec.push_back( "MB Pythia with distortions");
+  col.push_back(kBlack); 
+  */
+
+
+  // distortions testing in pp colliosions
+  finvec.push_back("root_files/nodist_20files_ntp_track_out.root");
+  legvec.push_back( "MB pp, 20 #mu s, no distortions");
+  col.push_back(kBlack); 
+
+  finvec.push_back("root_files/new_dist_20files_ntp_track_out.root");
+  legvec.push_back( "MB pp, 20 #mu s, with distortions");
+  col.push_back(kRed); 
+  
+finvec.push_back("root_files/dist_20files_ntp_track_out.root");
+  legvec.push_back( "MB pp, 20 #mu s, with distortions");
+  col.push_back(kBlue); 
+  
+
+  /*
+  finvec.push_back("root_files/ntp_track_out.root");
+  legvec.push_back( "MB pp, 20 #mu s, with distortions");
+  col.push_back(kRed); 
+  */
 
   // S&C review plots
   bool sandc = false;
@@ -347,6 +392,15 @@ finvec.push_back("newbins_newcuts_nodist_100pions_analyze_out/ntp_track_out.root
 
   //==========
 
+  TLatex *sphnx_sim = new TLatex(0.3, 0.82,"#bf{#it{sPHENIX}} simulation");
+  sphnx_sim->SetNDC();
+  TLatex *collvtx = new TLatex(0.3,0.77,"Collision vertex resolution");
+  collvtx->SetNDC();
+
+  TLatex *sphnx_sim2 = new TLatex(0.19, 0.85,"#bf{#it{sPHENIX}} simulation");
+  sphnx_sim2->SetNDC();
+  TLatex *jets = new TLatex(0.19, 0.79,"Pythia jet events");
+  jets->SetNDC();
 
   unsigned int nfiles = finvec.size();
 
@@ -378,9 +432,9 @@ finvec.push_back("newbins_newcuts_nodist_100pions_analyze_out/ntp_track_out.root
   cyvtx->Divide(nfiles,1);
   TCanvas *czvtx = new TCanvas("czvtx","czvtx",5,5,1600,800);
   czvtx->Divide(nfiles,1);
-  TCanvas *cvtxerr_x = new TCanvas("cvtxerr_x","cvtxerr X",5,5,1600,1200);
-  TCanvas *cvtxerr_y = new TCanvas("cvtxerr_y","cvtxerr Y",5,5,1600,1200);
-  TCanvas *cvtxerr_z = new TCanvas("cvtxerr_z","cvtxerr Z",5,5,1600,1200); 
+  TCanvas *cvtxerr_x = new TCanvas("cvtxerr_x","cvtxerr X",5,5,1200,1200);
+  TCanvas *cvtxerr_y = new TCanvas("cvtxerr_y","cvtxerr Y",5,5,1200,1200);
+  TCanvas *cvtxerr_z = new TCanvas("cvtxerr_z","cvtxerr Z",5,5,1200,1200); 
   TCanvas *ctemp0 = new TCanvas("ctemp0","ctemp0",5,5,1600,800);
   ctemp0->Divide(nfiles,1);
   TCanvas *cslice = new TCanvas("cslice","cslice",5,5,1600,800);
@@ -391,6 +445,8 @@ finvec.push_back("newbins_newcuts_nodist_100pions_analyze_out/ntp_track_out.root
   //cpt->cd(2); gPad->SetLeftMargin(0.2);
   TCanvas *ceff = new TCanvas("ceff","ceff",5,5,1200,800);
   ceff->SetLeftMargin(0.18);
+  TCanvas *cteff = new TCanvas("cteff","cteff",5,5,1200,800);
+  cteff->SetLeftMargin(0.18);
   TCanvas *ctemp1 = new TCanvas("ctemp1","ctemp1",5,5,1200,800);
   ctemp1->Divide(nfiles,1);
   TCanvas *cslicexy = new TCanvas("cslicexy","cslicexy",5,5,1600,800);
@@ -416,24 +472,30 @@ ccrossing->Divide(nfiles,2);
 TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
   ctrgvt->Divide(nfiles,1);
 
-  TLegend *lpd = new TLegend(0.3, 0.4, 0.85, 0.5, "", "NDC");
+  TLegend *lpd = new TLegend(0.3, 0.7, 0.85, 0.88, "", "NDC");
   lpd->SetBorderSize(1);
   lpd->SetFillColor(kWhite);
   lpd->SetFillStyle(1001);
 
+  //TLegend *lvtxres = new TLegend(0.41, 0.7, 0.85, 0.81, "Collision vertex resolution", "NDC");
+  TLegend *lvtxres = new TLegend(0.37, 0.63, 0.80, 0.76, "", "NDC");
+  lvtxres->SetBorderSize(0);
+  //lvtxres->SetFillColor(kWhite);
+  // lvtxres->SetFillStyle(1001);
 
-  TLegend *lvtxerr_x = new TLegend(0.1, 0.88, 0.9, 0.96, "", "NDC");
-  lvtxerr_x->SetBorderSize(1);
-  lvtxerr_x->SetFillColor(kWhite);
-  lvtxerr_x->SetFillStyle(1001);
-  TLegend *lvtxerr_y = new TLegend(0.1, 0.88, 0.9, 0.96, "", "NDC");
-  lvtxerr_y->SetBorderSize(1);
-  lvtxerr_y->SetFillColor(kWhite);
-  lvtxerr_y->SetFillStyle(1001);
-  TLegend *lvtxerr_z = new TLegend(0.1, 0.88, 0.9, 0.96, "", "NDC");
-  lvtxerr_z->SetBorderSize(1);
-  lvtxerr_z->SetFillColor(kWhite);
-  lvtxerr_z->SetFillStyle(1001);
+  //TLegend *lvtxerr_x = new TLegend(0.19, 0.63, 0.28, 0.75, "", "NDC");
+  TLegend *lvtxerr_x = new TLegend(0.62, 0.75, 0.75, 0.90, "", "NDC");
+  lvtxerr_x->SetBorderSize(0);
+  //lvtxerr_x->SetFillColor(kWhite);
+  //lvtxerr_x->SetFillStyle(1001);
+TLegend *lvtxerr_y = new TLegend(0.13, 0.64, 0.42, 0.76, "", "NDC");
+  lvtxerr_y->SetBorderSize(0);
+  //lvtxerr_y->SetFillColor(kWhite);
+  //lvtxerr_y->SetFillStyle(1001);
+  TLegend *lvtxerr_z = new TLegend(0.13, 0.64, 0.42, 0.76, "", "NDC");
+  lvtxerr_z->SetBorderSize(0);
+  //lvtxerr_z->SetFillColor(kWhite);
+  //lvtxerr_z->SetFillStyle(1001);
 
   TF1 *fz = new TF1("fz","gaus");
   fz->SetRange(-0.02, 0.02);
@@ -492,7 +554,8 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
 	  cgvt_pu->cd(i+1);
 	  hgvt_pu->GetXaxis()->SetNdivisions(504); 
 	  hgvt_pu->GetXaxis()->SetTitle("time (ns)");
-	  hgvt_pu->GetXaxis()->SetRangeUser(-10, 12000.0);
+	  hgvt_pu->SetTitle("Pileup vertex time");
+	  hgvt_pu->GetXaxis()->SetRangeUser(-5000, 24000.0);
 	  hgvt_pu->DrawCopy();
 	}
 
@@ -524,6 +587,7 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
 	{
 	  std::cout << "Found htrgvt " << std::endl;
 	  ctrgvt->cd(i+1);
+	  htrgvt->GetXaxis()->SetRangeUser(-5000, 24000);
 	  htrgvt->DrawCopy();
 	}
 
@@ -595,6 +659,7 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
 	  hxvterr->SetMarkerStyle(20);
 	  hxvterr->SetMarkerSize(1);
 	  hxvterr->SetLineColor(col[i]);
+	  hxvterr->GetXaxis()->SetNdivisions(506); 
 	  std::cout << " plotting hxvterr for file " << i << " on pad " << i+1 << std::endl; 
 	  if(i==0)
 	    hxvterr->Draw();
@@ -602,12 +667,14 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
 	    hxvterr->Draw("same");
 	  
 	  //  int nv = hxvterr->GetEntries();
-	  //sprintf(tmp," nv: %i RMS: %.4f",nv, sigma);
+	  //sprintf(tmp," nv: %i RMS =      %.4f",nv, sigma);
 	  double sigma = hxvterr->GetRMS();
-	  sprintf(tmp," RMS: %.5f",sigma);
+	  sprintf(tmp," #sigma=%.0f #mum",sigma*10000.0);
 	  std::string all = legvec[i] + tmp;
-	  lvtxerr_x->AddEntry(hxvterr, all.c_str(),"l");
-
+	  if(i == 0)
+	    lvtxerr_x->AddEntry(hxvterr, all.c_str(),"l");
+	  else
+	    lvtxerr_x->AddEntry(hxvterr, all.c_str(),"pel");
 	}
       TH1D *hyvterr;
       fin->GetObject("hyvterr",hyvterr); 
@@ -628,9 +695,13 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
 	    hyvterr->Draw("same");
 
 	  double sigma = hyvterr->GetRMS();
-	  sprintf(tmp," RMS: %.5f",sigma);
+	  sprintf(tmp," #sigma=%.0f #mum",sigma * 10000.0);
 	  std::string all = legvec[i] + tmp;
-	  lvtxerr_y->AddEntry(hxvterr, all.c_str(),"l");
+	  if(i == 0)
+	    lvtxerr_y->AddEntry(hxvterr, all.c_str(),"l");
+	  else
+	    lvtxerr_y->AddEntry(hxvterr, all.c_str(),"pel");
+	  //	  lvtxerr_y->AddEntry(hxvterr, all.c_str(),"l");
 	}
 
 
@@ -652,15 +723,15 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
 	    hzvterr->Draw("same");
 
 	  double sigma = hzvterr->GetRMS();
-	  sprintf(tmp," RMS: %.5f",sigma);
+	  sprintf(tmp," #sigma=%.0f #mum",sigma * 10000);
 	  std::string all = legvec[i] + tmp;
-	  lvtxerr_z->AddEntry(hxvterr, all.c_str(),"l");
+	  if(i == 0)
+	    lvtxerr_z->AddEntry(hxvterr, all.c_str(),"l");
+	  else
+	    lvtxerr_z->AddEntry(hxvterr, all.c_str(),"pel");
+	  //	  lvtxerr_z->AddEntry(hxvterr, all.c_str(),"l");
 	}
 
-
-      cvtxerr_x->cd(); lvtxerr_x->Draw();
-      cvtxerr_y->cd(); lvtxerr_y->Draw();
-      cvtxerr_z->cd(); lvtxerr_z->Draw();
 
 
       // mvtx association
@@ -737,7 +808,7 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
       hptres->SetMarkerSize(1.2);
       hptres->SetMarkerColor(col[i]);
       hptres->GetXaxis()->SetRangeUser(0, ptmax);
-      hptres->GetYaxis()->SetRangeUser(0.0, 0.04);
+      hptres->GetYaxis()->SetRangeUser(0.0, 0.15);
       hptres->SetTitle(";p_{T} [GeV/c];#frac{#Delta p_{T}}{p_{T}} (resolution)");
       if(i == 0)
 	hptres->DrawCopy("p");
@@ -776,12 +847,14 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
 	  hxvtres->SetMarkerSize(1.2);
 	  hxvtres->SetMarkerColor(col[i]);
 	  hxvtres->GetYaxis()->SetRangeUser(0.0, 0.006);
-	  hxvtres->GetYaxis()->SetTitle("Vertex #Deltax");
+	  hxvtres->GetXaxis()->SetRangeUser(0.0, 35.0);
+	  hxvtres->GetYaxis()->SetTitle("Vertex #Deltax (cm)");
 	  hxvtres->GetXaxis()->SetTitle("ntracks");
 	  if(i==0)
 	    hxvtres->DrawCopy();
 	  else
 	    hxvtres->Draw("same");
+	  lvtxres->AddEntry(hxvtres, legvec[i].c_str());
 	}
 
       // vertex resolutions vs ntracks
@@ -799,7 +872,8 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
 	  hzvtres->SetMarkerSize(1.2);
 	  hzvtres->SetMarkerColor(col[i]);
 	  hzvtres->GetYaxis()->SetRangeUser(0.0, 0.006);
-	  hzvtres->GetYaxis()->SetTitle("Vertex #Deltaz");
+	  hzvtres->GetXaxis()->SetRangeUser(0.0, 35.0);
+	  hzvtres->GetYaxis()->SetTitle("Vertex #Deltaz (cm)");
 	  hzvtres->GetXaxis()->SetTitle("ntracks");
 	  if(i==0)
 	    hzvtres->DrawCopy();
@@ -826,24 +900,67 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
 	  else if(all > 0)
 	    eff = 1.;
 	  heff->SetBinContent(ib, eff);
+	  double err = sqrt(all-pass)/all; 
+	   heff->SetBinError(ib, err);
 	}  
 
-      heff->SetTitle("MB Hijing + 50 KHz pileup + 100 pions");
+      heff->SetTitle("Track efficiency");
       heff->GetYaxis()->SetTitle("Efficiency");
       heff->GetYaxis()->SetTitleOffset(1.5);
       heff->GetXaxis()->SetTitle("p_{T} (GeV/c)");
-      heff->GetXaxis()->SetTitleOffset(1.2);
-      heff->SetMarkerStyle(20);
+      heff->GetXaxis()->SetTitleOffset(1.2); 
+     heff->SetMarkerStyle(20);
       heff->SetMarkerSize(1.5);
       heff->SetMarkerColor(col[i]);
       heff->GetXaxis()->SetRangeUser(0.0, ptmax);
-      heff->GetYaxis()->SetRangeUser(0.0, 1.0);
+      heff->GetYaxis()->SetRangeUser(0.0, 1.05);
       if(i==0)
 	heff->DrawCopy("p");
       else
 	heff->DrawCopy("p same");
 
       TLine *unit = new TLine(0,1.0,ptmax,1.0);
+      unit->Draw();
+
+      // Efficiency vs gvt
+      cteff->cd();
+      TH1D *hteff_num = 0;
+      TH1D *hteff_den = 0;
+      fin->GetObject("hteff_num",hteff_num);
+      fin->GetObject("hteff_den",hteff_den);
+
+      TH1D* hteff = (TH1D*)hteff_den->Clone("hteff");;
+
+      for(int ib=1;ib<=hteff_den->GetNbinsX();++ib)
+	{
+	  double pass = hteff_num->GetBinContent(ib);
+	  double all = hteff_den->GetBinContent(ib);
+	  double eff = 0;
+	  if(all > pass)
+	    eff = pass/all;
+	  else if(all > 0)
+	    eff = 1.;
+	  hteff->SetBinContent(ib, eff);
+	  //double err = sqrt(all-pass)/all; 
+	  //hteff->SetBinError(ib, err);
+	}  
+
+      hteff->SetTitle("Track efficiency vs gvt (gpt > 0.7)");
+      hteff->GetYaxis()->SetTitle("Efficiency");
+      hteff->GetYaxis()->SetTitleOffset(1.5);
+      hteff->GetXaxis()->SetTitle("gvt (ns)");
+      hteff->GetXaxis()->SetTitleOffset(1.2);
+      hteff->SetMarkerStyle(20);
+      hteff->SetMarkerSize(1.5);
+      hteff->SetMarkerColor(col[i]);
+      //heff->GetXaxis()->SetRangeUser(0.0, gvtmax);
+      hteff->GetYaxis()->SetRangeUser(0.0, 1.05);
+      if(i==0)
+	hteff->DrawCopy("p");
+      else
+	hteff->DrawCopy("p same");
+
+      //TLine *unit = new TLine(0,1.0,ptmax,1.0);
       //unit->Draw();
 
       // dca xy resolution
@@ -859,13 +976,20 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
       hdcaxyslice->SetLineColor(col[i]);      
       cslicexy->cd(i+1);
       hdcaxyslice->Draw();
+      /*      
+      TF1* fxy = new TF1("fxy","[0]*exp(-pow((x-[1])/[2], 2))",-0.1, 0.1);
+      fxy->SetParameter(1,0.0);
+      fxy->SetParameter(2,0.0030);
+      fxy->SetRange(-0.01, 0.01);
+      */
       hdcaxyslice->Fit("gaus");
-
+      
       cdcaxy->cd();  
       TF1 *f1 = new TF1("f1","gaus");
       f1->SetRange(-0.01, 0.01);
-       hdca2d->FitSlicesY(f1);
-       TH1D*hdcares = (TH1D*)gDirectory->Get("h2_2");
+      hdca2d->FitSlicesY(f1);
+      //hdca2d->FitSlicesY(fxy);
+      TH1D*hdcares = (TH1D*)gDirectory->Get("h2_2");
       hdcares->GetYaxis()->SetTitleOffset(2.1);
       hdcares->GetYaxis()->SetTitle("DCA(r#phi) (cm)");
       hdcares->GetXaxis()->SetTitleOffset(1.2);
@@ -892,10 +1016,17 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
       hdcazslice->SetLineColor(col[i]);      
       csliceZ->cd(i+1);
       hdcazslice->Draw();
-      hdcazslice->Fit("gaus");
-
+      // hdcazslice->Fit("gaus");
+      TF1* fz = new TF1("fz","[0]*exp(-pow((x-[1])/[2], 2))",-0.1, 0.1);
+      fz->SetParameter(1,0.0);
+      fz->SetParameter(2,0.0030);
+      fz->SetRange(-0.01, 0.01);
+      //hdcazslice->Fit("fz");
+      hdcazslice->Fit("f1");
+      
       cdcaZ->cd();
-      hdcaZ2d->FitSlicesY(fz);
+      //hdcaZ2d->FitSlicesY(fz);
+      hdcaZ2d->FitSlicesY(f1);
       TH1D* hdcaZres = (TH1D*)gDirectory->Get("h3_2");
 
       hdcaZres->GetYaxis()->SetTitleOffset(2.1);
@@ -944,12 +1075,12 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
 	}  
 
       hnmaps->GetXaxis()->SetTitle("p_{T} (GeV/c)");
-      hnmaps->GetYaxis()->SetTitle("MVTX association efficiency");
+      hnmaps->GetYaxis()->SetTitle("ntrumaps > 2 efficiency");
       hnmaps->GetYaxis()->SetTitleOffset(1.5);
       hnmaps->GetXaxis()->SetTitleOffset(1.2);
       hnmaps->GetXaxis()->SetRangeUser(0.0, ptmax);
       hnmaps->SetMinimum(0);
-      hnmaps->SetMaximum(1.0);
+      hnmaps->SetMaximum(1.05);
       hnmaps->SetMarkerStyle(20);
       hnmaps->SetMarkerSize(1.5);
       hnmaps->SetMarkerColor(col[i]);
@@ -967,7 +1098,7 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
       ccomb->cd();
 
       cout << " hnmaps bins " << hnmaps->GetNbinsX() << " heff bins " << heff->GetNbinsX() << endl;
-      heff->Rebin(1);
+      //heff->Rebin(1);
       cout << heff->GetNbinsX() << endl;
 
       TH1D *hcomb = (TH1D*) hnmaps->Clone();
@@ -998,18 +1129,24 @@ TCanvas *ctrgvt = new TCanvas("ctrgvt","ctrgvt",5,5,1200,800);
   
   cpt->cd();  lpd->Draw();
 
-  cxvtres->cd(1);  lpd->Draw();
-  cxvtres->cd(2);  lpd->Draw();
+  cxvtres->cd(1);  lvtxres->Draw(); sphnx_sim->Draw(); collvtx->Draw();
+  cxvtres->cd(2);  lvtxres->Draw(); sphnx_sim->Draw(); collvtx->Draw();
   
   cdcaxy->cd();  lpd->Draw();
   
   cdcaZ->cd();  lpd->Draw();
   
   ceff->cd();  lpd->Draw();
+
+  cteff->cd();  lpd->Draw();
   
   cmvtx->cd();  lpd->Draw();
   
   ccomb->cd();  lpd->Draw();
+  
+  cvtxerr_x->cd(); lvtxerr_x->Draw(); sphnx_sim2->Draw();
+  cvtxerr_y->cd(); lvtxerr_y->Draw(); sphnx_sim2->Draw();
+  cvtxerr_z->cd(); lvtxerr_z->Draw(); sphnx_sim2->Draw();
   
   
   

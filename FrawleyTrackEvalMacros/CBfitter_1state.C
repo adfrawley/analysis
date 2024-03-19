@@ -211,8 +211,8 @@ void CBfitter_1state()
       f1S->SetParameter(0, 0.5);     // alpha
       f1S->SetParameter(1, 5.0);      // n
       f1S->SetParameter(2, 9.46);      // xmean
-      f1S->SetParameter(3, 0.08);     // sigma
-      f1S->SetParameter(4, 100.0);    // N
+      f1S->SetParameter(3, 0.1);     // sigma
+      f1S->SetParameter(4, 1000.0);    // N
       f1S->SetParameter(5, 150.0);
       f1S->SetParameter(6,-1.0); 
 

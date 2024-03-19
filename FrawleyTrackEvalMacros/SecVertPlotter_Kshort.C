@@ -15,14 +15,18 @@ void SecVertPlotter_Kshort()
 {
   gStyle->SetOptTitle(1);
 
-  TFile *fin = new TFile("repo_eval_out/combined_eval_out.root");
+  //TFile *fin = new TFile("/sphenix/tg/tg01/hf/frawley/kshort_baseline/combined_Kshort.root");
+  //TFile *fin = new TFile("/sphenix/tg/tg01/hf/frawley/kshort_inflation1/combined_Kshort.root");
+  //TFile *fin = new TFile("/sphenix/tg/tg01/hf/frawley/kshort_inflation2/combined_Kshort.root");
+  //TFile *fin = new TFile("/sphenix/tg/tg01/hf/frawley/kshort_inflation4/combined_Kshort.root");
+  //TFile *fin = new TFile("/sphenix/tg/tg01/hf/frawley/kshort_inflation8/combined_Kshort.root");
+  TFile *fin = new TFile("/sphenix/tg/tg01/hf/frawley/kshort_baseline_3/combined_secvert.root");
 
   TNtuple *ntp;
   fin->GetObject("ntp", ntp);
 
-  //if(muons){decaymass = 0.1057;}
+
   Float_t decaymass = 0.13957;
-  //Float_t decaymass = 0.000511;
 
   Float_t x1, y1,z1,x2,y2,z2;
   Float_t px1, py1, pz1, px2, py2, pz2;
@@ -99,6 +103,12 @@ void SecVertPlotter_Kshort()
   double sig_lo = 0.47;
   double sig_hi = 0.53;
 
+  double qual_cut = 5.0;   // 5
+  double min_tpc_clusters = 40; // 40
+  double pair_dca_cut = 0.2;  // 0.2
+  double min_dca_cut_silicon = 0.02; //0.02
+  double pair_dca_cut_silicon = 0.05; // 0.05
+ 
   TH1D *hmass_si = new TH1D("hmass_si","",nmassbins,min_mass,max_mass);
   hmass_si->GetXaxis()->SetTitle("Invariant mass (GeV/c^2)");
   TH1D *hmass_nosi = new TH1D("hmass_nosi","",nmassbins,min_mass,max_mass);
@@ -127,10 +137,10 @@ void SecVertPlotter_Kshort()
       ntp->GetEntry(i);
 
       // common single track cuts
-      if(quality1 > 5 || quality2 > 5) continue;
-      if(tpcClusters_1 < 40 || tpcClusters_2 < 40) continue;
+      if(quality1 > qual_cut || quality2 > qual_cut) continue;
+      if(tpcClusters_1 < min_tpc_clusters || tpcClusters_2 < min_tpc_clusters) continue;
       // track pair cut
-      if(fabs(pair_dca) > 0.2) continue;
+      if(fabs(pair_dca) > pair_dca_cut) continue;
 
       TLorentzVector t1;
       Float_t E1 = sqrt(pow(vmomx1,2) + pow(vmomy1,2) + pow(vmomz1,2) + pow(decaymass,2));
@@ -181,9 +191,9 @@ void SecVertPlotter_Kshort()
 	}
       
       // has silicon match case
-      if( (fabs(dca3dxy1) > 0.02 && fabs(dca3dxy2) > 0.02)
-	  && (fabs(dca3dz1) > 0.02 && fabs(dca3dz2) > 0.02) 
-	  && (pair_dca < 0.05) )
+      if( (fabs(dca3dxy1) > min_dca_cut_silicon && fabs(dca3dxy2) > min_dca_cut_silicon)
+	  && (fabs(dca3dz1) > min_dca_cut_silicon && fabs(dca3dz2) > min_dca_cut_silicon) 
+	  && (pair_dca < pair_dca_cut_silicon) )
 	{
 	  if ( invariant_pt > 0.4) 
 	    {

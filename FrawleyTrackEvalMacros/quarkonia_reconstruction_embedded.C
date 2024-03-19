@@ -31,9 +31,8 @@ void quarkonia_reconstruction_embedded()
   int embed_flag = 2;  // embedding flag used during Upsilon generation
 
   // track cuts  
-  //double quality_cut = 3.0;
-  double quality_cut = 10.0;
-  //double quality_cut = 7.0;
+  //double quality_cut = 10.0;
+  double quality_cut = 30.0;
   double dca3dxy_cut = 0.1;
   double dca3dz_cut = 0.1;
   double nmaps_cut = 3;
@@ -94,7 +93,7 @@ void quarkonia_reconstruction_embedded()
   double nhittpcin_wt = 0;
 
     // The condor job output files -  we open them one at a time and process them
-  for(int i=0;i<50;i++)
+  for(int i=0;i<500;i++)
     {
       if(nrecormass > nups_requested)
 	{
@@ -104,7 +103,7 @@ void quarkonia_reconstruction_embedded()
       
       char name[500];
 
-       sprintf(name,"/sphenix/user/frawley/new_macros_april27/macros/detectors/sPHENIX/eval_output/g4svtx_eval_%i.root",i);
+       sprintf(name,"/sphenix/tg/tg01/hf/frawley/pythia_pp_testing/generator_ups1s_dist/pythia_pp_%i_g4svtx_eval.root",i);
 
 
       /*      
@@ -163,7 +162,7 @@ void quarkonia_reconstruction_embedded()
 
       int nr = 0;
       int ng = 0;
-      int nev = 10;
+      int nev = 200;
       //int nev = ntp_vertex->GetEntries();
 
       for(int iev=0;iev<nev;iev++)
